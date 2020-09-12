@@ -2,6 +2,8 @@ package splunk
 
 import (
 	"github.com/mattermost/mattermost-server/v5/model"
+	"log"
+	"sync"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/store"
 )
@@ -9,6 +11,9 @@ import (
 // Splunk API for business logic
 type Splunk interface {
 	PluginAPI
+
+	AddAlertListener(AlertActionFunc)
+	NotifyAll(AlertActionWHPayload)
 }
 
 // Dependencies contains all API dependencies
@@ -33,6 +38,7 @@ type PluginAPI interface {
 
 type splunk struct {
 	Config
+	notifier *alertNotifier
 }
 
 // New returns new Splunk API object
@@ -41,7 +47,18 @@ func New(apiConfig Config) Splunk {
 }
 
 func newSplunk(apiConfig Config) *splunk {
-	return &splunk{
+	s := &splunk{
+		notifier: &alertNotifier{
+			receivers: make([]AlertActionFunc, 0),
+			lock:      &sync.Mutex{},
+		},
 		Config: apiConfig,
 	}
+
+	//Todo: Alert action receiving example must be changed
+	s.AddAlertListener(func(payload AlertActionWHPayload) {
+		log.Println(payload)
+	})
+
+	return s
 }
