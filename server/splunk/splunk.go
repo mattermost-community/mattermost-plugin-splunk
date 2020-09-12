@@ -1,11 +1,12 @@
 package splunk
 
 import (
-	"github.com/mattermost/mattermost-server/v5/model"
 	"log"
 	"sync"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/store"
+
+	"github.com/mattermost/mattermost-server/v5/model"
 )
 
 // Splunk API for business logic
@@ -30,6 +31,7 @@ type Config struct {
 // PluginAPI API form mattermost plugin
 type PluginAPI interface {
 	SendEphemeralPost(userID string, post *model.Post) *model.Post
+	CreatePost(post *model.Post) (*model.Post, error)
 
 	GetUsersInChannel(channelID, sortBy string, page, perPage int) ([]*model.User, error)
 	PublishWebSocketEvent(event string, payload map[string]interface{}, broadcast *model.WebsocketBroadcast)

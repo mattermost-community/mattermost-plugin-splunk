@@ -10,6 +10,15 @@ func (p *plugin) SendEphemeralPost(userID string, post *model.Post) *model.Post 
 	return p.API.SendEphemeralPost(userID, post)
 }
 
+// SendEphemeralPost responds user request with message
+func (p *plugin) CreatePost(post *model.Post) (*model.Post, error) {
+	post, err := p.API.CreatePost(post)
+	if err != nil {
+		return nil, errors.Wrap(err, "error while creating post message")
+	}
+	return post, nil
+}
+
 // GetUsersInChannel gets paginated user list for channel
 func (p *plugin) GetUsersInChannel(channelID, sortBy string, page, perPage int) ([]*model.User, error) {
 	users, err := p.API.GetUsersInChannel(channelID, sortBy, page, perPage)

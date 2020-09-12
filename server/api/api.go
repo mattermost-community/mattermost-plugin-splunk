@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/bakurits/mattermost-plugin-splunk/server/config"
 	"net/http"
 
+	"github.com/bakurits/mattermost-plugin-splunk/server/config"
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/gorilla/mux"
