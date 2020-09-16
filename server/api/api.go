@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/bakurits/mattermost-plugin-splunk/server/config"
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/gorilla/mux"
@@ -34,8 +35,24 @@ func newHandler(sp splunk.Splunk) *handler {
 		Router: mux.NewRouter(),
 		sp:     sp,
 	}
-	// Todo : add API path handlers
+	apiRouter := h.Router.PathPrefix(config.APIPath).Subrouter()
+
+	apiRouter.HandleFunc("/alert_action_wh", h.handleAlertActionWH()).Methods(http.MethodPost)
+
 	return h
+}
+
+func (h *handler) handleAlertActionWH() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req splunk.AlertActionWHPayload
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
+			return
+		}
+
+		h.sp.NotifyAll(req)
+	}
 }
 
 func (h *handler) jsonError(w http.ResponseWriter, err Error) {

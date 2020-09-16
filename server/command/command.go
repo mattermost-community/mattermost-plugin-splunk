@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
@@ -15,7 +16,7 @@ const (
 	autoCompleteDescription = ""
 	autoCompleteHint        = ""
 	pluginDescription       = ""
-	slashCommandName        = ""
+	slashCommandName        = "splunk"
 )
 
 // Handler returns API for interacting with plugin commands
@@ -105,9 +106,24 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
-			// Todo: add more slash commands
+			"alert/--subscribe": c.subscribeAlert,
 		},
 		defaultHandler: c.help,
 	}
 	return c
+}
+
+func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
+	c.splunk.AddAlertListener(func(payload splunk.AlertActionWHPayload) {
+		_, err := c.splunk.CreatePost(&model.Post{
+			ChannelId: c.args.ChannelId,
+			Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
+		})
+		if err != nil {
+			log.Println(err)
+		}
+	})
+
+	c.postCommandResponse("Subscribed to alerts")
+	return &model.CommandResponse{}, nil
 }
