@@ -52,6 +52,7 @@ func (h *handler) handleAlertActionWH() http.HandlerFunc {
 		}
 
 		h.sp.NotifyAll(req)
+		h.respondWithSuccess(w)
 	}
 }
 
