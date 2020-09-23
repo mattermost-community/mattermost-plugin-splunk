@@ -116,6 +116,7 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	c.splunk.AddAlertListener(func(payload splunk.AlertActionWHPayload) {
 		_, err := c.splunk.CreatePost(&model.Post{
+			UserId:    c.splunk.BotUser(),
 			ChannelId: c.args.ChannelId,
 			Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
 		})
