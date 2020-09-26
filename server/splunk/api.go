@@ -2,7 +2,7 @@ package splunk
 
 type wHFirstResult struct {
 	SourceType string `json:"sourcetype"`
-	Count      int    `json:"count"`
+	Count      string `json:"count"`
 }
 
 // AlertActionWHPayload is unmarshal-ed json payload of alert webhook action
