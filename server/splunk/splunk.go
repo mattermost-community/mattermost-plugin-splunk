@@ -15,6 +15,8 @@ type Splunk interface {
 
 	AddAlertListener(AlertActionFunc)
 	NotifyAll(AlertActionWHPayload)
+	AddBotUser(string)
+	BotUser() string
 }
 
 // Dependencies contains all API dependencies
@@ -40,12 +42,23 @@ type PluginAPI interface {
 
 type splunk struct {
 	Config
-	notifier *alertNotifier
+	notifier  *alertNotifier
+	botUserID string
 }
 
 // New returns new Splunk API object
 func New(apiConfig Config) Splunk {
 	return newSplunk(apiConfig)
+}
+
+// AddBotUser registers new bot user
+func (s *splunk) AddBotUser(bID string) {
+	s.botUserID = bID
+}
+
+// BotUser returns id of bot user
+func (s *splunk) BotUser() string {
+	return s.botUserID
 }
 
 func newSplunk(apiConfig Config) *splunk {
