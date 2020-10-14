@@ -1,7 +1,6 @@
 package splunk
 
 import (
-	"log"
 	"sync"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/store"
@@ -13,7 +12,7 @@ import (
 type Splunk interface {
 	PluginAPI
 
-	AddAlertListener(AlertActionFunc)
+	AddAlertListener(string, AlertActionFunc)
 	NotifyAll(AlertActionWHPayload)
 	AddBotUser(string)
 	BotUser() string
@@ -64,16 +63,11 @@ func (s *splunk) BotUser() string {
 func newSplunk(apiConfig Config) *splunk {
 	s := &splunk{
 		notifier: &alertNotifier{
-			receivers: make([]AlertActionFunc, 0),
+			receivers: make(map[string]AlertActionFunc, 0),
 			lock:      &sync.Mutex{},
 		},
 		Config: apiConfig,
 	}
-
-	//Todo: Alert action receiving example must be changed
-	s.AddAlertListener(func(payload AlertActionWHPayload) {
-		log.Println(payload)
-	})
 
 	return s
 }
