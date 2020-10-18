@@ -1,5 +1,19 @@
 package splunk
 
+import (
+	"encoding/xml"
+	"io"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/pkg/errors"
+)
+
+const (
+	LogsEndpoint = ":8089/services/server/logger"
+)
+
 type wHFirstResult struct {
 	SourceType string `json:"sourcetype"`
 	Count      string `json:"count"`
@@ -35,4 +49,47 @@ func (s *splunk) AddAlertListener(channelID string, f AlertActionFunc) {
 // NotifyAll notifies all listeners about new alert action
 func (s *splunk) NotifyAll(payload AlertActionWHPayload) {
 	s.notifier.notifyAll(payload)
+}
+
+func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, s.SplunkServerBaseURL+url, body)
+	if err != nil {
+		return nil, errors.Wrap(err, "bad request")
+	}
+
+	req.SetBasicAuth(s.SplunkUserName, s.SplunkPassword)
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "connection problem")
+	}
+	return resp, err
+}
+
+type LogEntry struct {
+	ID             string    `xml:"id"`
+	LastUpdateTime time.Time `xml:"updated"`
+	Author         string    `xml:"author"`
+}
+
+type Logs struct {
+	ID             string     `xml:"id"`
+	LastUpdateTime time.Time  `xml:"updated"`
+	Author         string     `xml:"author"`
+	Entries        []LogEntry `xml:"entry"`
+}
+
+func (s *splunk) Logs() {
+	resp, err := s.doHTTPRequest(http.MethodGet, LogsEndpoint, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	var a Logs
+	err = xml.NewDecoder(resp.Body).Decode(&a)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	log.Println(a)
 }

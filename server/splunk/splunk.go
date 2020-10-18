@@ -1,6 +1,8 @@
 package splunk
 
 import (
+	"crypto/tls"
+	"net/http"
 	"sync"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/store"
@@ -16,6 +18,8 @@ type Splunk interface {
 	NotifyAll(AlertActionWHPayload)
 	AddBotUser(string)
 	BotUser() string
+
+	Logs()
 }
 
 // Dependencies contains all API dependencies
@@ -27,6 +31,10 @@ type Dependencies struct {
 // Config Splunk configuration
 type Config struct {
 	*Dependencies
+
+	SplunkServerBaseURL string
+	SplunkUserName      string
+	SplunkPassword      string
 }
 
 // PluginAPI API form mattermost plugin
@@ -43,6 +51,8 @@ type splunk struct {
 	Config
 	notifier  *alertNotifier
 	botUserID string
+
+	httpClient *http.Client
 }
 
 // New returns new Splunk API object
@@ -62,11 +72,16 @@ func (s *splunk) BotUser() string {
 
 func newSplunk(apiConfig Config) *splunk {
 	s := &splunk{
+		Config: apiConfig,
 		notifier: &alertNotifier{
 			receivers: make(map[string]AlertActionFunc, 0),
 			lock:      &sync.Mutex{},
 		},
-		Config: apiConfig,
+		httpClient: &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		},
 	}
 
 	return s
