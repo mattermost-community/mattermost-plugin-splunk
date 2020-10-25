@@ -1,11 +1,19 @@
 package store
 
-// Store encapsulates all store APIs
-type Store interface{}
+import "github.com/bakurits/mattermost-plugin-splunk/server/utils/store"
 
-type pluginStore struct{}
+// Store encapsulates all store APIs
+type Store interface {
+	SubscriptionStore
+}
+
+type pluginStore struct {
+	subscriptionStore store.KVStore
+}
 
 // NewPluginStore creates Store object from plugin.API
 func NewPluginStore(api API) Store {
-	return &pluginStore{}
+	return &pluginStore{
+		subscriptionStore: store.NewPluginStore(api),
+	}
 }
