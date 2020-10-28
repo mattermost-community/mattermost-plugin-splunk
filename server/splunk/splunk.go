@@ -19,7 +19,7 @@ type Splunk interface {
 	AddBotUser(string)
 	BotUser() string
 
-	Logs()
+	Logs(string)
 }
 
 // Dependencies contains all API dependencies

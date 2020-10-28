@@ -27,7 +27,7 @@ func Test_splunk_Logs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := New(tt.fields.Config)
-			s.Logs()
+			s.Logs("gae_app_module_id_default__logs__2020-10-14T12-56.csv")
 		})
 	}
 }
