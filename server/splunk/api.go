@@ -1,17 +1,13 @@
 package splunk
 
 import (
-	"encoding/xml"
-	"io"
-	"log"
-	"net/http"
-	"time"
-
 	"github.com/pkg/errors"
+	"io"
+	"net/http"
 )
 
 const (
-	LogsEndpoint = ":8089/services/server/logger"
+	LogsEndpoint = ":8089/services/search/jobs"
 )
 
 type wHFirstResult struct {
@@ -64,32 +60,4 @@ func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http
 		return nil, errors.Wrap(err, "connection problem")
 	}
 	return resp, err
-}
-
-type LogEntry struct {
-	ID             string    `xml:"id"`
-	LastUpdateTime time.Time `xml:"updated"`
-	Author         string    `xml:"author"`
-}
-
-type Logs struct {
-	ID             string     `xml:"id"`
-	LastUpdateTime time.Time  `xml:"updated"`
-	Author         string     `xml:"author"`
-	Entries        []LogEntry `xml:"entry"`
-}
-
-func (s *splunk) Logs() {
-	resp, err := s.doHTTPRequest(http.MethodGet, LogsEndpoint, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	var a Logs
-	err = xml.NewDecoder(resp.Body).Decode(&a)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	log.Println(a)
 }
