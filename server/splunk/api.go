@@ -1,15 +1,9 @@
 package splunk
 
 import (
-	"encoding/xml"
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"strings"
-	"time"
-
 	"github.com/pkg/errors"
+	"io"
+	"net/http"
 )
 
 const (
@@ -66,51 +60,4 @@ func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http
 		return nil, errors.Wrap(err, "connection problem")
 	}
 	return resp, err
-}
-
-type LogEntry struct {
-	Title          string    `xml:"title"`
-	ID             string    `xml:"id"`
-	LastUpdateTime time.Time `xml:"updated"`
-	Author         string    `xml:"author"`
-}
-
-type Logs struct {
-	ID             string     `xml:"id"`
-	LastUpdateTime time.Time  `xml:"updated"`
-	Author         string     `xml:"author"`
-	Entries        []LogEntry `xml:"entry"`
-}
-
-func (s *splunk) Logs(source string) {
-	bodyString := fmt.Sprintf("search index=_internal source=%s", source)
-	resp, err := s.doHTTPRequest(http.MethodPost, LogsEndpoint, strings.NewReader(bodyString))
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	var logs Logs
-	err = xml.NewDecoder(resp.Body).Decode(&logs)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	id, err := logs.GetLogID()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	log.Println(id)
-}
-
-func (l *Logs) GetLogID() (string, error) {
-	for _, e := range l.Entries {
-		if !strings.HasPrefix(e.Title, "search") {
-			continue
-		}
-		return e.ID, nil
-	}
-	return "", errors.New("not found")
 }
