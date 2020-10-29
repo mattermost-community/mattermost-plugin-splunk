@@ -74,7 +74,7 @@ func newSplunk(apiConfig Config) *splunk {
 	s := &splunk{
 		Config: apiConfig,
 		notifier: &alertNotifier{
-			receivers: make(map[string]AlertActionFunc, 0),
+			receivers: make(map[string]AlertActionFunc),
 			lock:      &sync.Mutex{},
 		},
 		httpClient: &http.Client{

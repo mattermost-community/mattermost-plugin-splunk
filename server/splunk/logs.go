@@ -3,10 +3,11 @@ package splunk
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/pkg/errors"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type LogResults struct {
@@ -26,6 +27,7 @@ func (s *splunk) Logs(source string) (LogResults, error) {
 	if err != nil {
 		return LogResults{}, errors.Wrap(err, "no log info")
 	}
+	defer func() { _ = resp.Body.Close() }()
 	var logInfo logInfo
 	if err = xml.NewDecoder(resp.Body).Decode(&logInfo); err != nil {
 		return LogResults{}, errors.Wrap(err, "unexpected response")
@@ -40,6 +42,7 @@ func (s *splunk) Logs(source string) (LogResults, error) {
 	if err != nil {
 		return LogResults{}, errors.Wrap(err, "no data for log results")
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	var logResults LogResults
 	if err = xml.NewDecoder(resp.Body).Decode(&logResults); err != nil {

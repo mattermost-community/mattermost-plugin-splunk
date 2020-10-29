@@ -1,9 +1,10 @@
 package splunk
 
 import (
-	"github.com/pkg/errors"
 	"net/url"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func URLLastFragment(urlString string) (string, error) {

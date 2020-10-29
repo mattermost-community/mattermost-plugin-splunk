@@ -1,9 +1,10 @@
 package splunk
 
 import (
-	"github.com/pkg/errors"
 	"io"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 const (
