@@ -86,7 +86,7 @@ func (p *plugin) OnActivate() error {
 		return errors.Wrap(err, "OnActivate: failed to register command")
 	}
 
-	botID, err := p.Helpers.EnsureBot(&model.Bot{
+	botID, _ := p.Helpers.EnsureBot(&model.Bot{
 		Username:    "splunk",
 		DisplayName: "Splunk",
 		Description: "Created by the Splunk plugin.",
