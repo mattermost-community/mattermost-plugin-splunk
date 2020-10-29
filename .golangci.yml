@@ -25,7 +25,7 @@ linters:
     - gofmt
     - goimports
     - golint
-    - gosec
+    #     - gosec
     - gosimple
     - govet
     - ineffassign
@@ -36,7 +36,7 @@ linters:
     - stylecheck
     - typecheck
     - unconvert
-    - unused
+    #    - unused
     - varcheck
     - whitespace
 
