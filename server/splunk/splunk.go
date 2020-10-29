@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/store"
+	utils_store "github.com/bakurits/mattermost-plugin-splunk/server/utils/store"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
@@ -37,7 +38,7 @@ type PluginAPI interface {
 
 	GetUsersInChannel(channelID, sortBy string, page, perPage int) ([]*model.User, error)
 	PublishWebSocketEvent(event string, payload map[string]interface{}, broadcast *model.WebsocketBroadcast)
-	store.API
+	utils_store.API
 }
 
 type splunk struct {

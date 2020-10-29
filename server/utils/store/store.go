@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+
 	"github.com/mattermost/mattermost-server/v5/model"
 
 	"github.com/pkg/errors"
@@ -38,7 +39,7 @@ func (s *pluginStore) Load(key string) ([]byte, error) {
 		return nil, errors.WithMessage(appErr, "failed plugin KVGet")
 	}
 	if data == nil {
-		return nil, errors.New("Error while loading data from KVStore")
+		return nil, errors.New("error while loading data from KVStore")
 	}
 	return data, nil
 }
