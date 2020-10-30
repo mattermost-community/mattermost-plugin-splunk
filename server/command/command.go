@@ -107,6 +107,7 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
+			"log/--list":        c.getLogSourceList,
 		},
 		defaultHandler: c.help,
 	}
@@ -127,4 +128,15 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 
 	c.postCommandResponse("Subscribed to alerts")
 	return &model.CommandResponse{}, nil
+}
+
+func (c *command) getLogSourceList(_ ...string) (*model.CommandResponse, error) {
+	return &model.CommandResponse{
+		Text: createMDForLogsList(c.splunk.ListLogs()),
+	}, nil
+}
+
+func createMDForLogsList(results []string) string {
+	// TODO: Gvantsats
+	return ""
 }
