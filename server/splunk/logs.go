@@ -52,6 +52,21 @@ func (s *splunk) Logs(source string) (LogResults, error) {
 	return logResults, nil
 }
 
+func (s *splunk) ListLogs() []string {
+	bodyString := "search index=_internal | stats count by source"
+	resp, err := s.doHTTPRequest(http.MethodPost, LogsEndpoint, strings.NewReader(bodyString))
+	if err != nil {
+		return []string{}
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	var logInfo logInfo
+	if err = xml.NewDecoder(resp.Body).Decode(&logInfo); err != nil {
+		return []string{}
+	}
+	return logInfo.getLogSources()
+}
+
 type logInfo struct {
 	ID             string    `xml:"id"`
 	LastUpdateTime time.Time `xml:"updated"`
@@ -73,4 +88,25 @@ func (l *logInfo) getLogID() (string, error) {
 		return id, err
 	}
 	return "", errors.New("not found")
+}
+
+func (l *logInfo) getLogSources() []string {
+	sources := make(map[string]struct{})
+	for _, e := range l.Entries {
+		if !strings.HasPrefix(e.Title, "search") {
+			continue
+		}
+		var source string
+		n, err := fmt.Sscanf(e.Title, "search source=\"%s", &source)
+		if err != nil || n != 1 {
+			continue
+		}
+		source = strings.TrimSuffix(source, "\"")
+		sources[source] = struct{}{}
+	}
+	var res []string
+	for k, _ := range sources {
+		res = append(res, k)
+	}
+	return res
 }
