@@ -137,6 +137,12 @@ func (c *command) getLogSourceList(_ ...string) (*model.CommandResponse, error) 
 }
 
 func createMDForLogsList(results []string) string {
-	// TODO: Gvantsats
-	return ""
+	res := ""
+	for _, s := range results {
+		res += "* " + s + "\n"
+	}
+	if res == "" {
+		return "No logs available"
+	}
+	return res
 }

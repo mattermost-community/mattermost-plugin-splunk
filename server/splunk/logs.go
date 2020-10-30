@@ -60,11 +60,11 @@ func (s *splunk) ListLogs() []string {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	var logInfo logInfo
-	if err = xml.NewDecoder(resp.Body).Decode(&logInfo); err != nil {
+	var logInformation logInfo
+	if err = xml.NewDecoder(resp.Body).Decode(&logInformation); err != nil {
 		return []string{}
 	}
-	return logInfo.getLogSources()
+	return logInformation.getLogSources()
 }
 
 type logInfo struct {
@@ -105,7 +105,7 @@ func (l *logInfo) getLogSources() []string {
 		sources[source] = struct{}{}
 	}
 	var res []string
-	for k, _ := range sources {
+	for k := range sources {
 		res = append(res, k)
 	}
 	return res
