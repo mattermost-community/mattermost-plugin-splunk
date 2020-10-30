@@ -14,6 +14,9 @@ import (
 type Splunk interface {
 	PluginAPI
 
+	User() User
+	ChangeUser(User)
+
 	AddAlertListener(string, AlertActionFunc)
 	NotifyAll(AlertActionWHPayload)
 	AddBotUser(string)
@@ -28,13 +31,18 @@ type Dependencies struct {
 	store.Store
 }
 
+// User stores info about splunk user
+type User struct {
+	ServerBaseURL string
+	UserName      string
+	Password      string
+}
+
 // Config Splunk configuration
 type Config struct {
 	*Dependencies
 
-	SplunkServerBaseURL string
-	SplunkUserName      string
-	SplunkPassword      string
+	SplunkUserInfo User
 }
 
 // PluginAPI API form mattermost plugin
@@ -68,6 +76,15 @@ func (s *splunk) AddBotUser(bID string) {
 // BotUser returns id of bot user
 func (s *splunk) BotUser() string {
 	return s.botUserID
+}
+
+// User returns splunk user info
+func (s *splunk) User() User {
+	return s.SplunkUserInfo
+}
+
+func (s *splunk) ChangeUser(user User) {
+	s.SplunkUserInfo = user
 }
 
 func newSplunk(apiConfig Config) *splunk {

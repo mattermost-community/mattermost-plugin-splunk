@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// LogResults stores result of log fetching
 type LogResults struct {
 	Results []struct {
 		Fields []struct {
