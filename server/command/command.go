@@ -6,13 +6,21 @@ import (
 	"strings"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
-
 	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/pkg/errors"
 )
 
 const (
-	helpTextHeader          = "###### Mattermost Splunk Plugin - Slash command help\n"
-	helpText                = ``
+	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
+	helpText       = `
+* |/splunk help| - print this help message
+* |/splunk a [message]| - send message in encrypted form 
+* |/anonymous keypair [action]| - do one of the following actions regarding encryption keypair
+  * |action| is one of the following:
+    * |--generate| - generates and stores new keypair for encryption
+	* |--overwrite [private key]| - you enter new 32byte private key, the plugin stores it along with the updated public key
+    * |--export| - exports your existing keypair
+`
 	autoCompleteDescription = ""
 	autoCompleteHint        = ""
 	pluginDescription       = ""
@@ -103,10 +111,10 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 		args:   args,
 		splunk: a,
 	}
-
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
+			"logs":              c.getLogs,
 			"log/--list":        c.getLogSourceList,
 		},
 		defaultHandler: c.help,
@@ -130,10 +138,30 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{}, nil
 }
 
+func (c *command) getLogs(args ...string) (*model.CommandResponse, error) {
+	if len(args) != 1 {
+		c.postCommandResponse("Please enter correct number of arguments")
+		return nil, errors.New("wrong number of args")
+	}
+	logResults, err := c.splunk.Logs(args[0])
+	if err != nil {
+		c.postCommandResponse("Error while retrieving logs")
+		return nil, err
+	}
+	return &model.CommandResponse{
+		Text: createMDForLogs(logResults),
+	}, nil
+}
+
 func (c *command) getLogSourceList(_ ...string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{
 		Text: createMDForLogsList(c.splunk.ListLogs()),
 	}, nil
+}
+
+func createMDForLogs(results splunk.LogResults) string {
+	// TODO: Gvantsats
+	return ""
 }
 
 func createMDForLogsList(results []string) string {
