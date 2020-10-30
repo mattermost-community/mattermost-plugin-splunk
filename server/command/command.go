@@ -14,12 +14,9 @@ const (
 	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
 	helpText       = `
 * |/splunk help| - print this help message
-* |/splunk a [message]| - send message in encrypted form 
-* |/anonymous keypair [action]| - do one of the following actions regarding encryption keypair
-  * |action| is one of the following:
-    * |--generate| - generates and stores new keypair for encryption
-	* |--overwrite [private key]| - you enter new 32byte private key, the plugin stores it along with the updated public key
-    * |--export| - exports your existing keypair
+* |/splunk alert --subscribe - subscribe to alerts
+* |/splunk logs --list - list names of logs on server
+* |/splunk log [logname] - show specific log from server
 `
 	autoCompleteDescription = ""
 	autoCompleteHint        = ""
