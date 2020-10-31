@@ -6,14 +6,20 @@ import (
 	"strings"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
-
 	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/pkg/errors"
 )
 
 const (
-	helpTextHeader          = "###### Mattermost Splunk Plugin - Slash command help\n"
-	helpText                = ``
+	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
+	helpText       = `
+* |/splunk help| - print this help message
+* |/splunk a [message]| - send message in encrypted form 
+* |/anonymous keypair [action]| - do one of the following actions regarding encryption keypair
+  * |action| is one of the following:
+    * |--generate| - generates and stores new keypair for encryption
+	* |--overwrite [private key]| - you enter new 32byte private key, the plugin stores it along with the updated public key
+    * |--export| - exports your existing keypair
+`
 	autoCompleteDescription = ""
 	autoCompleteHint        = ""
 	pluginDescription       = ""
@@ -104,13 +110,16 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 		args:   args,
 		splunk: a,
 	}
-
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
-			"auth/--user":       c.authUser,
-			"auth/--login":      c.authLogin,
-			"auth/--logout":     c.authLogout,
+
+			"log":        c.getLogs,
+			"log/--list": c.getLogSourceList,
+
+			"auth/--user":   c.authUser,
+			"auth/--login":  c.authLogin,
+			"auth/--logout": c.authLogout,
 		},
 		defaultHandler: c.help,
 	}
@@ -133,6 +142,43 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{}, nil
 }
 
+func (c *command) getLogs(args ...string) (*model.CommandResponse, error) {
+	if len(args) != 1 {
+		return &model.CommandResponse{Text: "Please enter correct number of arguments"}, nil
+	}
+
+	logResults, err := c.splunk.Logs(args[0])
+	if err != nil {
+		return &model.CommandResponse{Text: "Error while retrieving logs"}, nil
+	}
+
+	return &model.CommandResponse{
+		Text: createMDForLogs(logResults),
+	}, nil
+}
+
+func (c *command) getLogSourceList(_ ...string) (*model.CommandResponse, error) {
+	return &model.CommandResponse{
+		Text: createMDForLogsList(c.splunk.ListLogs()),
+	}, nil
+}
+
+func createMDForLogs(results splunk.LogResults) string {
+	// TODO: Gvantsats
+	return ""
+}
+
+func createMDForLogsList(results []string) string {
+	res := ""
+	for _, s := range results {
+		res += "* " + s + "\n"
+	}
+	if res == "" {
+		return "No logs available"
+	}
+	return res
+}
+
 func (c *command) authUser(_ ...string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{
 		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().ServerBaseURL, c.splunk.User().UserName),
@@ -143,7 +189,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 	if len(args) != 3 {
 		return &model.CommandResponse{
 			Text: "Must have 3 arguments",
-		}, errors.New("wrong number of arguments")
+		}, nil
 	}
 
 	c.splunk.ChangeUser(splunk.User{
@@ -156,7 +202,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 		c.splunk.ChangeUser(splunk.User{})
 		return &model.CommandResponse{
 			Text: "Wrong credentials. Try again",
-		}, errors.Wrap(err, "can't authenticate")
+		}, nil
 	}
 
 	return &model.CommandResponse{Text: "Successfully authenticated"}, nil

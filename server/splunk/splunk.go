@@ -25,6 +25,7 @@ type Splunk interface {
 	BotUser() string
 
 	Logs(string) (LogResults, error)
+	ListLogs() []string
 }
 
 // Dependencies contains all API dependencies
