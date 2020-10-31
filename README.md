@@ -1,78 +1,79 @@
-# Plugin Starter Template [![CircleCI branch](https://img.shields.io/circleci/project/github/mattermost/mattermost-plugin-starter-template/master.svg)](https://circleci.com/gh/mattermost/mattermost-plugin-starter-template)
+# Splunk Plugin 
+**Maintainer:** [@dbejanishvili](https://github.com/dbejanishvili)
+**Co-Maintainers:** [@bakurits](https://github.com/bakurits) [@Gvantsats](https://github.com/Gvantsats)
 
-This plugin serves as a starting point for writing a Mattermost plugin. Feel free to base your own plugin off this repository.
+Splunk integration for mattermost. Enabling users to get logs and alerts from splunk server.
+To learn more about Mattermost plugins, see [Mattermost plugin documentation](https://developers.mattermost.com/extend/plugins/).
 
-To learn more about plugins, see [our plugin documentation](https://developers.mattermost.com/extend/plugins/).
+## Table of Contents
+- [License](#license)
+- [System Admin Instructions](#for-mattermost-system-admins)
+    - [Plugin Setup](#plugin-setup)
+- [User Instructions](#for-users)
+    - [Slash Commands](#slash-commands)
+- [Developer/Contributor Instructions](#for-developers-and-contributors)
+    - [Setting Up Environment](#setting-up-environment)
+    - [Building And Deployment](#building-and-deployment)
 
-## Getting Started
-Use GitHub's template feature to make a copy of this repository by clicking the "Use this template" button.
+## **License**
 
-Alternatively shallow clone the repository matching your plugin name:
+This repository is licensed under the [Apache 2.0 License](https://github.com/bakurits/mattermost-plugin-anonymous/blob/master/LICENSE).
+
+
+## **For Mattermost System Admins**
+### Plugin Setup
+You can install the plugin from mattermost plugin marketplace, or follow the instructions given in [Building And Deployment](#building-and-deployment) section
+
+## **For Users**
+### Slash Commands
+* __Authenticate user__ - use `/splunk auth --login [server base url] [username] [password] ` you must be logged into the system before you use any slash commands regarding logging. To authenticate user you can use this slash command with three required parameters splunk server base url, splunk username and password. After successful authentication this message is shown:
+
+    ![GitHub plugin screenshot](images/auth_success.png)
+
+* __Get list of all logs from server__ - use `/splunk log --list` this slash command returns list of all available logs from splunk server.
+
+    ![GitHub plugin screenshot](images/log_list.png)
+
+* __Get specific log from server__ - use `/splunk log [logname]` to get specific log from server you can use this slash command. 
+
+    ![GitHub plugin screenshot](images/log.png)
+
+* __Subscribe to alerts__ - use `/splunk alert --subscribe` to subsribe to alerts you must first use this slash command and add link for splunk
+
+    ![GitHub plugin screenshot](images/alert.png)
+
+    after receiving alert splunk bot posts in the channel that new alert is received.
+
+    ![GitHub plugin screenshot](images/alert_received.png)
+
+
+
+* __Help!__ - use `/splunk help` command, to see how to properly use slash commands
+
+
+## **For Developers And Contributors**
+### Setting Up Environment
+Fork the repository to your own account and then clone it to a directory outside of `$GOPATH` matching your plugin name:
 ```
-git clone --depth 1 https://github.com/mattermost/mattermost-plugin-starter-template com.example.my-plugin
+git clone https://github.com/owner/mattermost-plugin-splunk
 ```
 
-Note that this project uses [Go modules](https://github.com/golang/go/wiki/Modules). Be sure to locate the project outside of `$GOPATH`.
+Note that this project uses [Go modules](https://github.com/golang/go/wiki/Modules). Be sure to locate the project outside of `$GOPATH`, or allow the use of Go modules within your `$GOPATH` with an `export GO111MODULE=on`.
 
-Edit `plugin.json` with your `id`, `name`, and `description`:
-```
-{
-    "id": "com.example.my-plugin",
-    "name": "My Plugin",
-    "description": "A plugin to enhance Mattermost."
-}
-```
+### Building And Deployment
+To build your plugin use `make`
 
-Build your plugin:
-```
-make
-```
+Use `make check-style` to check the style.
 
-This will produce a single plugin file (with support for multiple architectures) for upload to your Mattermost server:
+Use `make debug-dist` and `make debug-deploy` in place of `make dist` and `make deploy` to configure webpack to generate unminified Javascript.
+
+`make` will produce a single plugin file (with support for multiple architectures) for upload to your Mattermost server:
 
 ```
 dist/com.example.my-plugin.tar.gz
 ```
 
-## Development
-
-To avoid having to manually install your plugin, build and deploy your plugin using one of the following options.
-
-### Deploying with Local Mode
-
-If your Mattermost server is running locally, you can enable [local mode](https://docs.mattermost.com/administration/mmctl-cli-tool.html#local-mode) to streamline deploying your plugin. Edit your server configuration as follows:
-
-```json
-{
-    "ServiceSettings": {
-        ...
-        "EnableLocalMode": true,
-        "LocalModeSocketLocation": "/var/tmp/mattermost_local.socket"
-    }
-}
-```
-
-and then deploy your plugin:
-```
-make deploy
-```
-
-You may also customize the Unix socket path:
-```
-export MM_LOCALSOCKETPATH=/var/tmp/alternate_local.socket
-make deploy
-```
-
-If developing a plugin with a webapp, watch for changes and deploy those automatically:
-```
-export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
-export MM_ADMIN_TOKEN=j44acwd8obn78cdcx7koid4jkr
-make watch
-```
-
-### Deploying with credentials
-
-Alternatively, you can authenticate with the server's API with credentials:
+Alternatively you can deploy a plugin automatically to your server, but it requires login credentials:
 ```
 export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
 export MM_ADMIN_USERNAME=admin
@@ -80,38 +81,14 @@ export MM_ADMIN_PASSWORD=password
 make deploy
 ```
 
-or with a [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html):
+or configuration of a [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html):
 ```
 export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
 export MM_ADMIN_TOKEN=j44acwd8obn78cdcx7koid4jkr
 make deploy
 ```
 
-## Q&A
+In production, deploy and upload your plugin via the [System Console](https://about.mattermost.com/default-plugin-uploads).
 
-### How do I make a server-only or web app-only plugin?
 
-Simply delete the `server` or `webapp` folders and remove the corresponding sections from `plugin.json`. The build scripts will skip the missing portions automatically.
-
-### How do I include assets in the plugin bundle?
-
-Place them into the `assets` directory. To use an asset at runtime, build the path to your asset and open as a regular file:
-
-```go
-bundlePath, err := p.API.GetBundlePath()
-if err != nil {
-    return errors.Wrap(err, "failed to get bundle path")
-}
-
-profileImage, err := ioutil.ReadFile(filepath.Join(bundlePath, "assets", "profile_image.png"))
-if err != nil {
-    return errors.Wrap(err, "failed to read profile image")
-}
-
-if appErr := p.API.SetProfileImage(userID, profileImage); appErr != nil {
-    return errors.Wrap(err, "failed to set profile image")
-}
-```
-
-### How do I build the plugin with unminified JavaScript?
-Setting the `MM_DEBUG` environment variable will invoke the debug builds. The simplist way to do this is to simply include this variable in your calls to `make` (e.g. `make dist MM_DEBUG=1`).
+ 

@@ -14,7 +14,8 @@ const (
 	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
 	helpText       = `
 * |/splunk help| - print this help message
-* |/splunk alert| --subscribe - subscribe to alerts
+* |/splunk auth --login [server base url] [username] [password]| - log into the splunk server
+* |/splunk alert --subscribe| - subscribe to alerts
 * |/splunk logs --list| - list names of logs on server
 * |/splunk log [logname]| - show specific log from server
 `
@@ -177,7 +178,7 @@ func createMDForLogs(results splunk.LogResults) string {
 	}
 
 	res += "\n| :- | :- | :- |\n"
-	var fields = make([]string, len(fieldNames), len(fieldNames))
+	var fields = make([]string, len(fieldNames))
 	for _, result := range results.Results {
 		for i := range fields {
 			fields[i] = ""
