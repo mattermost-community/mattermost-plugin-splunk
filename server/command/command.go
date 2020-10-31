@@ -162,8 +162,40 @@ func (c *command) getLogSourceList(_ ...string) (*model.CommandResponse, error) 
 }
 
 func createMDForLogs(results splunk.LogResults) string {
-	// TODO: Gvantsats
-	return ""
+	fieldNames := make(map[string]int)
+	index := 0
+	res := "|"
+	for _, result := range results.Results {
+		for _, field := range result.Fields {
+			_, ok := fieldNames[field.Name]
+			if !ok {
+				fieldNames[field.Name] = index
+				index++
+				res += " " + field.Name + " |"
+			}
+		}
+	}
+
+	res += "\n| :- | :- | :- |\n"
+	var fields = make([]string, len(fieldNames), len(fieldNames))
+	for _, result := range results.Results {
+		for i := range fields {
+			fields[i] = ""
+		}
+		for _, field := range result.Fields {
+			ind := fieldNames[field.Name]
+			fields[ind] = field.Value.Text
+		}
+		res += "|"
+		for i := range fields {
+			res += " " + fields[i] + " |"
+		}
+		res += "\n"
+	}
+	if res == "" {
+		return "Log is empty"
+	}
+	return res
 }
 
 func createMDForLogsList(results []string) string {
