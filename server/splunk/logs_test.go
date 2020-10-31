@@ -21,10 +21,12 @@ func Test_splunk_Logs(t *testing.T) {
 			name: "",
 			fields: fields{
 				Config: Config{
-					Dependencies:        nil,
-					SplunkServerBaseURL: "https://207.154.235.95",
-					SplunkUserName:      "bakurits",
-					SplunkPassword:      "matarebeli",
+					Dependencies: nil,
+					SplunkUserInfo: User{
+						ServerBaseURL: "https://207.154.235.95",
+						UserName:      "bakurits",
+						Password:      "matarebeli",
+					},
 				},
 			},
 		},
@@ -51,10 +53,12 @@ func Test_splunk_ListLogs(t *testing.T) {
 			name: "",
 			fields: fields{
 				Config: Config{
-					Dependencies:        nil,
-					SplunkServerBaseURL: "https://207.154.235.95",
-					SplunkUserName:      "bakurits",
-					SplunkPassword:      "matarebeli",
+					Dependencies: nil,
+					SplunkUserInfo: User{
+						ServerBaseURL: "https://207.154.235.95",
+						UserName:      "bakurits",
+						Password:      "matarebeli",
+					},
 				},
 			},
 		},
