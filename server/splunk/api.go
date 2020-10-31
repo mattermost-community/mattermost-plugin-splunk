@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	// LogsEndpoint endpoint for log retrieval
 	LogsEndpoint = ":8089/services/search/jobs"
 )
 
@@ -49,12 +50,17 @@ func (s *splunk) NotifyAll(payload AlertActionWHPayload) {
 }
 
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, s.SplunkServerBaseURL+url, body)
+	user := s.User()
+	if user.ServerBaseURL == "" || user.UserName == "" || user.Password == "" {
+		return nil, errors.New("unauthorized")
+	}
+
+	req, err := http.NewRequest(method, user.ServerBaseURL+url, body)
 	if err != nil {
 		return nil, errors.Wrap(err, "bad request")
 	}
 
-	req.SetBasicAuth(s.SplunkUserName, s.SplunkPassword)
+	req.SetBasicAuth(user.UserName, user.Password)
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {

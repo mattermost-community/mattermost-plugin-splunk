@@ -8,6 +8,7 @@ import (
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -107,6 +108,9 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
+			"auth/--user":       c.authUser,
+			"auth/--login":      c.authLogin,
+			"auth/--logout":     c.authLogout,
 		},
 		defaultHandler: c.help,
 	}
@@ -127,4 +131,40 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 
 	c.postCommandResponse("Subscribed to alerts")
 	return &model.CommandResponse{}, nil
+}
+
+func (c *command) authUser(_ ...string) (*model.CommandResponse, error) {
+	return &model.CommandResponse{
+		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().ServerBaseURL, c.splunk.User().UserName),
+	}, nil
+}
+
+func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
+	if len(args) != 3 {
+		return &model.CommandResponse{
+			Text: "Must have 3 arguments",
+		}, errors.New("wrong number of arguments")
+	}
+
+	c.splunk.ChangeUser(splunk.User{
+		ServerBaseURL: args[0],
+		UserName:      args[1],
+		Password:      args[2],
+	})
+
+	if err := c.splunk.Ping(); err != nil {
+		c.splunk.ChangeUser(splunk.User{})
+		return &model.CommandResponse{
+			Text: "Wrong credentials. Try again",
+		}, errors.Wrap(err, "can't authenticate")
+	}
+
+	return &model.CommandResponse{Text: "Successfully authenticated"}, nil
+}
+
+func (c *command) authLogout(_ ...string) (*model.CommandResponse, error) {
+	c.splunk.ChangeUser(splunk.User{})
+	return &model.CommandResponse{
+		Text: "Successful logout",
+	}, nil
 }
