@@ -17,7 +17,7 @@ type Splunk interface {
 	User() User
 	ChangeUser(User)
 
-	Ping() error
+	Ping(string, string, string) error
 
 	AddAlertListener(string, AlertActionFunc)
 	NotifyAll(AlertActionWHPayload)

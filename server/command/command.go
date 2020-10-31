@@ -177,7 +177,7 @@ func createMDForLogs(results splunk.LogResults) string {
 	}
 
 	res += "\n| :- | :- | :- |\n"
-	var fields = make([]string, len(fieldNames), len(fieldNames))
+	var fields = make([]string, len(fieldNames))
 	for _, result := range results.Results {
 		for i := range fields {
 			fields[i] = ""
@@ -228,7 +228,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 		Password:      args[2],
 	})
 
-	if err := c.splunk.Ping(); err != nil {
+	if err := c.splunk.Ping(args[0], args[1], args[2]); err != nil {
 		c.splunk.ChangeUser(splunk.User{})
 		return &model.CommandResponse{
 			Text: "Wrong credentials. Try again",
