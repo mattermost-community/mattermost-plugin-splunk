@@ -7,7 +7,6 @@ import (
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
 	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -114,11 +113,13 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
-			"logs":              c.getLogs,
-			"log/--list":        c.getLogSourceList,
-			"auth/--user":       c.authUser,
-			"auth/--login":      c.authLogin,
-			"auth/--logout":     c.authLogout,
+
+			"log":        c.getLogs,
+			"log/--list": c.getLogSourceList,
+
+			"auth/--user":   c.authUser,
+			"auth/--login":  c.authLogin,
+			"auth/--logout": c.authLogout,
 		},
 		defaultHandler: c.help,
 	}
@@ -143,14 +144,14 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 
 func (c *command) getLogs(args ...string) (*model.CommandResponse, error) {
 	if len(args) != 1 {
-		c.postCommandResponse("Please enter correct number of arguments")
-		return nil, errors.New("wrong number of args")
+		return &model.CommandResponse{Text: "Please enter correct number of arguments"}, nil
 	}
+
 	logResults, err := c.splunk.Logs(args[0])
 	if err != nil {
-		c.postCommandResponse("Error while retrieving logs")
-		return nil, err
+		return &model.CommandResponse{Text: "Error while retrieving logs"}, nil
 	}
+
 	return &model.CommandResponse{
 		Text: createMDForLogs(logResults),
 	}, nil
@@ -188,7 +189,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 	if len(args) != 3 {
 		return &model.CommandResponse{
 			Text: "Must have 3 arguments",
-		}, errors.New("wrong number of arguments")
+		}, nil
 	}
 
 	c.splunk.ChangeUser(splunk.User{
@@ -201,7 +202,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 		c.splunk.ChangeUser(splunk.User{})
 		return &model.CommandResponse{
 			Text: "Wrong credentials. Try again",
-		}, errors.Wrap(err, "can't authenticate")
+		}, nil
 	}
 
 	return &model.CommandResponse{Text: "Successfully authenticated"}, nil
