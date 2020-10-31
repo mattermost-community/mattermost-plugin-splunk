@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
+
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
 )
@@ -14,9 +15,9 @@ const (
 	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
 	helpText       = `
 * |/splunk help| - print this help message
-* |/splunk alert --subscribe - subscribe to alerts
-* |/splunk logs --list - list names of logs on server
-* |/splunk log [logname] - show specific log from server
+* |/splunk alert| --subscribe - subscribe to alerts
+* |/splunk logs --list| - list names of logs on server
+* |/splunk log [logname]| - show specific log from server
 `
 	autoCompleteDescription = ""
 	autoCompleteHint        = ""
