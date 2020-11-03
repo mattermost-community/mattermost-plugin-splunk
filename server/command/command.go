@@ -8,7 +8,7 @@ import (
 	"github.com/bakurits/mattermost-plugin-splunk/server/api"
 	"github.com/bakurits/mattermost-plugin-splunk/server/config"
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
-	"github.com/pborman/uuid"
+	"github.com/google/uuid"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
@@ -141,7 +141,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 		api.WebhookEndpoint,
 		id)
 
-	c.splunk.AddAlertListener(c.args.ChannelId, id, func(payload splunk.AlertActionWHPayload) {
+	c.splunk.AddAlertListener(c.args.ChannelId, id.String(), func(payload splunk.AlertActionWHPayload) {
 		_, err := c.splunk.CreatePost(&model.Post{
 			UserId:    c.splunk.BotUser(),
 			ChannelId: c.args.ChannelId,
