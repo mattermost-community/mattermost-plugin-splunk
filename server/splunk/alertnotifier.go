@@ -3,20 +3,25 @@ package splunk
 import "sync"
 
 type alertNotifier struct {
-	receivers map[string]AlertActionFunc
-	lock      sync.Locker
+	receivers       map[string]AlertActionFunc
+	alertsInChannel map[string][]string
+	lock            sync.Locker
 }
 
-func (a *alertNotifier) addAlertActionFunc(channelID string, f AlertActionFunc) {
+func (a *alertNotifier) addAlertActionFunc(channelID string, alertID string, f AlertActionFunc) {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	a.receivers[channelID] = f
+	a.receivers[alertID] = f
+	if _, ok := a.alertsInChannel[channelID]; !ok {
+		a.alertsInChannel[channelID] = []string{}
+	}
+	a.alertsInChannel[channelID] = append(a.alertsInChannel[channelID], alertID)
 }
 
-func (a *alertNotifier) notifyAll(payload AlertActionWHPayload) {
+func (a *alertNotifier) notifyAll(alertID string, payload AlertActionWHPayload) {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	for _, f := range a.receivers {
+	if f, ok := a.receivers[alertID]; ok {
 		f(payload)
 	}
 }

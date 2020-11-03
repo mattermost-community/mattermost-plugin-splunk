@@ -5,7 +5,10 @@ import (
 	"log"
 	"strings"
 
+	"github.com/bakurits/mattermost-plugin-splunk/server/api"
+	"github.com/bakurits/mattermost-plugin-splunk/server/config"
 	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
+	"github.com/pborman/uuid"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 )
@@ -40,8 +43,8 @@ type HandlerMap struct {
 }
 
 // NewHandler returns new Handler with given dependencies
-func NewHandler(args *model.CommandArgs, a splunk.Splunk) Handler {
-	return newCommand(args, a)
+func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) Handler {
+	return newCommand(args, conf, a)
 }
 
 // GetSlashCommand returns command to register
@@ -75,6 +78,7 @@ func (c *command) Handle(args ...string) (*model.CommandResponse, error) {
 // command stores command specific information
 type command struct {
 	args    *model.CommandArgs
+	config  *config.Config
 	splunk  splunk.Splunk
 	handler HandlerMap
 }
@@ -104,9 +108,10 @@ func (c *command) responseRedirect(redirectURL string) *model.CommandResponse {
 	}
 }
 
-func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
+func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *command {
 	c := &command{
 		args:   args,
+		config: conf,
 		splunk: a,
 	}
 	c.handler = HandlerMap{
@@ -126,7 +131,17 @@ func newCommand(args *model.CommandArgs, a splunk.Splunk) *command {
 }
 
 func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
-	c.splunk.AddAlertListener(c.args.ChannelId, func(payload splunk.AlertActionWHPayload) {
+	id := uuid.New()
+	post := fmt.Sprintf(
+		"Added alert\nYou can copy following link to your splunk alert action: %s/plugins/%s%s%s?id=%s",
+		c.args.SiteURL,
+		// TODO: Must replace with c.config.PluginID it returns empty string now
+		"com.mattermost.plugin-splunk",
+		config.APIPath,
+		api.WebhookEndpoint,
+		id)
+
+	c.splunk.AddAlertListener(c.args.ChannelId, id, func(payload splunk.AlertActionWHPayload) {
 		_, err := c.splunk.CreatePost(&model.Post{
 			UserId:    c.splunk.BotUser(),
 			ChannelId: c.args.ChannelId,
@@ -136,9 +151,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 			log.Println(err)
 		}
 	})
-
-	c.postCommandResponse("Subscribed to alerts")
-	return &model.CommandResponse{}, nil
+	return &model.CommandResponse{Text: post}, nil
 }
 
 func (c *command) getLogs(args ...string) (*model.CommandResponse, error) {

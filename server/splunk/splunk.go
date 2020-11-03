@@ -19,8 +19,9 @@ type Splunk interface {
 
 	Ping() error
 
-	AddAlertListener(string, AlertActionFunc)
-	NotifyAll(AlertActionWHPayload)
+	AddAlertListener(string, string, AlertActionFunc)
+	NotifyAll(string, AlertActionWHPayload)
+
 	AddBotUser(string)
 	BotUser() string
 
@@ -94,8 +95,9 @@ func newSplunk(apiConfig Config) *splunk {
 	s := &splunk{
 		Config: apiConfig,
 		notifier: &alertNotifier{
-			receivers: make(map[string]AlertActionFunc),
-			lock:      &sync.Mutex{},
+			receivers:       make(map[string]AlertActionFunc),
+			alertsInChannel: make(map[string][]string),
+			lock:            &sync.Mutex{},
 		},
 		httpClient: &http.Client{
 			Transport: &http.Transport{

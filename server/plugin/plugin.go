@@ -103,7 +103,7 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 		return &model.CommandResponse{}, &model.AppError{Message: "Not authorized"}
 	}
 
-	commandHandler := command.NewHandler(commandArgs, p.sp)
+	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp)
 	args := strings.Fields(commandArgs.Command)
 
 	commandResponse, err := commandHandler.Handle(args...)
