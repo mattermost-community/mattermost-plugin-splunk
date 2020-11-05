@@ -11,6 +11,11 @@ import (
 	"github.com/mattermost/mattermost-server/v5/mlog"
 )
 
+const (
+	// WebhookEndpoint a
+	WebhookEndpoint = "/alert_action_wh"
+)
+
 // Error - returned error message for api errors
 type Error struct {
 	Message    string `json:"message"`
@@ -37,7 +42,7 @@ func newHandler(sp splunk.Splunk) *handler {
 	}
 	apiRouter := h.Router.PathPrefix(config.APIPath).Subrouter()
 
-	apiRouter.HandleFunc("/alert_action_wh", h.handleAlertActionWH()).Methods(http.MethodPost)
+	apiRouter.HandleFunc(WebhookEndpoint, h.handleAlertActionWH()).Methods(http.MethodPost)
 
 	return h
 }
@@ -51,7 +56,12 @@ func (h *handler) handleAlertActionWH() http.HandlerFunc {
 			return
 		}
 
-		h.sp.NotifyAll(req)
+		id, err := getURLParam(r, "id")
+		if err != nil {
+			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
+			return
+		}
+		h.sp.NotifyAll(id, req)
 		h.respondWithSuccess(w)
 	}
 }
