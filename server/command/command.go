@@ -117,6 +117,8 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
+			"alert/--list":      c.subscribeAlert,
+			"alert/--delete":    c.subscribeAlert,
 
 			"log":        c.getLogs,
 			"log/--list": c.getLogSourceList,
@@ -152,6 +154,28 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 		}
 	})
 	return &model.CommandResponse{Text: post}, nil
+}
+
+func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
+	return &model.CommandResponse{
+		Text: createMDForLogsList(c.splunk.ListAlert(c.args.ChannelId)),
+	}, nil
+}
+
+func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
+	if len(args) != 1 {
+		return &model.CommandResponse{Text: "Please enter correct number of arguments"}, nil
+	}
+
+	var post = "Successfully removed alert"
+	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
+	if err != nil {
+		post = "Error while removing alert"
+	}
+
+	return &model.CommandResponse{
+		Text: post,
+	}, nil
 }
 
 func (c *command) getLogs(args ...string) (*model.CommandResponse, error) {

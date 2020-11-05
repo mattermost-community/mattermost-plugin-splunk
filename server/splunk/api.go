@@ -50,11 +50,11 @@ func (s *splunk) NotifyAll(alertID string, payload AlertActionWHPayload) {
 }
 
 func (s *splunk) ListAlert(channelID string) []string {
-	return []string{}
+	return s.ListAlert(channelID)
 }
 
 func (s *splunk) DeleteAlert(channelID string, alertID string) error {
-	return nil
+	return s.DeleteAlert(channelID, alertID)
 }
 
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
