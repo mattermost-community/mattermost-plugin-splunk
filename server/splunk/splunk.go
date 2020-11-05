@@ -21,6 +21,8 @@ type Splunk interface {
 
 	AddAlertListener(string, string, AlertActionFunc)
 	NotifyAll(string, AlertActionWHPayload)
+	ListAlert(string) []string
+	DeleteAlert(string, string) error
 
 	AddBotUser(string)
 	BotUser() string

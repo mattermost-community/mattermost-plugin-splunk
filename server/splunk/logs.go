@@ -85,7 +85,7 @@ func (l *logInfo) getLogID() (string, error) {
 		if !strings.HasPrefix(e.Title, "search") {
 			continue
 		}
-		id, err := URLLastFragment(e.ID)
+		id, err := urlLastFragment(e.ID)
 		return id, err
 	}
 	return "", errors.New("not found")

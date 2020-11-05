@@ -49,6 +49,14 @@ func (s *splunk) NotifyAll(alertID string, payload AlertActionWHPayload) {
 	s.notifier.notifyAll(alertID, payload)
 }
 
+func (s *splunk) ListAlert(channelID string) []string {
+	return []string{}
+}
+
+func (s *splunk) DeleteAlert(channelID string, alertID string) error {
+	return nil
+}
+
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
 	user := s.User()
 	if user.ServerBaseURL == "" || user.UserName == "" || user.Password == "" {
