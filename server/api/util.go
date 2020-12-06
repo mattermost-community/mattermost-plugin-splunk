@@ -7,10 +7,10 @@ import (
 )
 
 func getURLParam(r *http.Request, key string) (string, error) {
-	keys, ok := r.URL.Query()[key]
-	if !ok || len(keys[0]) < 1 {
+	val := r.URL.Query().Get(key)
+	if val == "" {
 		return "", errors.New("key missing")
 	}
 
-	return keys[0], nil
+	return val, nil
 }
