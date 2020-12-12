@@ -132,18 +132,25 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 	return c
 }
 
-func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
+// alertSubscriptionMessage creates message for alert subscription
+// returns message text and unique id for alert
+func alertSubscriptionMessage(siteURL string) (string, string) {
 	id := uuid.New()
 	post := fmt.Sprintf(
-		"Added alert\nYou can copy following link to your splunk alert action: %s/plugins/%s%s%s?id=%s",
-		c.args.SiteURL,
+		"Added alert\n"+
+			"You can copy following link to your splunk alert action: %s/plugins/%s%s%s?id=%s",
+		siteURL,
 		// TODO: Must replace with c.config.PluginID it returns empty string now
 		"com.mattermost.plugin-splunk",
 		config.APIPath,
 		api.WebhookEndpoint,
 		id)
+	return post, id.String()
+}
 
-	c.splunk.AddAlertListener(c.args.ChannelId, id.String(), func(payload splunk.AlertActionWHPayload) {
+func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
+	post, id := alertSubscriptionMessage(c.args.SiteURL)
+	c.splunk.AddAlertListener(c.args.ChannelId, id, func(payload splunk.AlertActionWHPayload) {
 		_, err := c.splunk.CreatePost(&model.Post{
 			UserId:    c.splunk.BotUser(),
 			ChannelId: c.args.ChannelId,
