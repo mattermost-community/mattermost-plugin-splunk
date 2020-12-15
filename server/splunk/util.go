@@ -29,8 +29,5 @@ func deleteFromSlice(ss []string, ind int) []string {
 	if ind < 0 || ind >= len(ss) {
 		return ss
 	}
-
-	ss[ind] = ss[len(ss)-1]
-	ss[len(ss)-1] = ""
-	return ss[:len(ss)-1]
+	return append(ss[0:ind], ss[ind+1:]...)
 }
