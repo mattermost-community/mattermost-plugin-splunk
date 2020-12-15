@@ -85,21 +85,15 @@ type command struct {
 
 func (c *command) help(_ ...string) (*model.CommandResponse, error) {
 	helpText := helpTextHeader + helpText
-	c.postCommandResponse(helpText)
-	return &model.CommandResponse{}, nil
+	return c.postCommandResponse(helpText), nil
 }
 
-func (c *command) postCommandResponse(text string) {
-	post := &model.Post{
-		ChannelId: c.args.ChannelId,
-		Message:   text,
-	}
-	_ = c.splunk.SendEphemeralPost(c.args.UserId, post)
+func (c *command) postCommandResponse(text string) *model.CommandResponse {
+	return &model.CommandResponse{Text: text}
 }
 
 func (c *command) responsef(format string, args ...interface{}) *model.CommandResponse {
-	c.postCommandResponse(fmt.Sprintf(format, args...))
-	return &model.CommandResponse{}
+	return c.postCommandResponse(fmt.Sprintf(format, args...))
 }
 
 func (c *command) responseRedirect(redirectURL string) *model.CommandResponse {
@@ -149,7 +143,7 @@ func alertSubscriptionMessage(siteURL string) (string, string) {
 }
 
 func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
-	post, id := alertSubscriptionMessage(c.args.SiteURL)
+	message, id := alertSubscriptionMessage(c.args.SiteURL)
 	c.splunk.AddAlertListener(c.args.ChannelId, id, func(payload splunk.AlertActionWHPayload) {
 		_, err := c.splunk.CreatePost(&model.Post{
 			UserId:    c.splunk.BotUser(),
@@ -160,7 +154,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 			log.Println(err)
 		}
 	})
-	return &model.CommandResponse{Text: post}, nil
+	return c.postCommandResponse(message), nil
 }
 
 func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
@@ -174,14 +168,14 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 		return &model.CommandResponse{Text: "Please enter correct number of arguments"}, nil
 	}
 
-	var post = "Successfully removed alert"
+	var message = "Successfully removed alert"
 	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
-		post = "Error while removing alert"
+		message = "Error while removing alert"
 	}
 
 	return &model.CommandResponse{
-		Text: post,
+		Text: message,
 	}, nil
 }
 
