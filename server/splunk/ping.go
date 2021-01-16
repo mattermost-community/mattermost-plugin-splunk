@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	// auth endpoint for checking auth info
+	// AuthEndpoint auth endpoint for checking auth info
 	AuthEndpoint = ":8089/services/auth/login"
 )
 
-func (s *splunk) Ping(serverBaseURL string, userName string, password string) error {
-	bodyMap := map[string]string{"username": userName, "password": password}
+func (s *splunk) Ping() error {
+	bodyMap := map[string]string{"username": s.SplunkUserInfo.UserName, "password": s.SplunkUserInfo.Password}
 	body, _ := json.Marshal(bodyMap)
-	req, err := http.NewRequest(http.MethodPost, serverBaseURL+AuthEndpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodPost, s.SplunkUserInfo.ServerBaseURL+AuthEndpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return errors.Wrap(err, "bad request")
 	}
