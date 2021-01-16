@@ -40,13 +40,21 @@ type AlertActionWHPayload struct {
 type AlertActionFunc func(payload AlertActionWHPayload)
 
 // AddAlertListener registers new listener for alert action
-func (s *splunk) AddAlertListener(channelID string, f AlertActionFunc) {
-	s.notifier.addAlertActionFunc(channelID, f)
+func (s *splunk) AddAlertListener(channelID string, alertID string, f AlertActionFunc) {
+	s.notifier.addAlertActionFunc(channelID, alertID, f)
 }
 
 // NotifyAll notifies all listeners about new alert action
-func (s *splunk) NotifyAll(payload AlertActionWHPayload) {
-	s.notifier.notifyAll(payload)
+func (s *splunk) NotifyAll(alertID string, payload AlertActionWHPayload) {
+	s.notifier.notifyAll(alertID, payload)
+}
+
+func (s *splunk) ListAlert(channelID string) []string {
+	return s.notifier.list(channelID)
+}
+
+func (s *splunk) DeleteAlert(channelID string, alertID string) error {
+	return s.notifier.delete(channelID, alertID)
 }
 
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
