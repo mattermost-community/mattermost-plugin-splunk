@@ -1,30 +1,23 @@
 package splunk
 
 import (
-	"bytes"
-	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 )
 
-const (
-	// AuthEndpoint auth endpoint for checking auth info
-	AuthEndpoint = ":8089/services/auth/login"
-)
-
 func (s *splunk) Ping() error {
-	bodyMap := map[string]string{"username": s.SplunkUserInfo.UserName, "password": s.SplunkUserInfo.Password}
-	body, _ := json.Marshal(bodyMap)
-	req, err := http.NewRequest(http.MethodPost, s.SplunkUserInfo.ServerBaseURL+AuthEndpoint, bytes.NewBuffer(body))
-	if err != nil {
-		return errors.Wrap(err, "bad request")
-	}
-
-	resp, err := s.httpClient.Do(req)
-	defer func() { _ = resp.Body.Close() }()
+	bodyString := "search index=_internal | stats count by source"
+	resp, err := s.doHTTPRequest(http.MethodPost, LogsEndpoint, strings.NewReader(bodyString))
 	if err != nil {
 		return errors.Wrap(err, "connection problem")
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("non-ok status code %d", resp.StatusCode)
 	}
 	return nil
 }
