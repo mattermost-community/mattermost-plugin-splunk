@@ -24,8 +24,8 @@ func Test_splunk_Logs(t *testing.T) {
 					Dependencies: nil,
 					SplunkUserInfo: User{
 						ServerBaseURL: "https://207.154.235.95",
-						UserName:      "bakurits",
-						Password:      "matarebeli",
+						UserName:      "splunk_admin",
+						Password:      "splunk_admin",
 					},
 				},
 			},
@@ -34,7 +34,7 @@ func Test_splunk_Logs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := New(tt.fields.Config)
-			logs, err := s.Logs("gae_app_module_id_default__logs__2020-10-14T12-56.csv")
+			logs, err := s.Logs("downloaded-logs-20210119-171858.csv")
 			is.NoError(err)
 			fmt.Println(logs)
 		})
@@ -56,8 +56,8 @@ func Test_splunk_ListLogs(t *testing.T) {
 					Dependencies: nil,
 					SplunkUserInfo: User{
 						ServerBaseURL: "https://207.154.235.95",
-						UserName:      "bakurits",
-						Password:      "matarebeli",
+						UserName:      "splunk_admin",
+						Password:      "splunk_admin",
 					},
 				},
 			},
