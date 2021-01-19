@@ -3,7 +3,7 @@
 const manifest = JSON.parse(`
 {
     "id": "com.mattermost.plugin-splunk",
-    "name": "Plugin Splunk",
+    "name": "Splunk",
     "description": "Splunk plugin for mattermost",
     "version": "0.1.0",
     "min_server_version": "5.12.0",
