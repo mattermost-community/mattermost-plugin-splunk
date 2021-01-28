@@ -9,7 +9,7 @@ import (
 
 const (
 	// LogsEndpoint endpoint for log retrieval
-	LogsEndpoint = ":8089/services/search/jobs"
+	LogsEndpoint = "/services/search/jobs"
 )
 
 type wHFirstResult struct {
