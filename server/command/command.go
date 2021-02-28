@@ -255,13 +255,13 @@ func (c *command) authUser(_ ...string) (*model.CommandResponse, error) {
 }
 
 func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
-	if len(args) < 3 {
+	if len(args) < 2 {
 		return &model.CommandResponse{
-			Text: "Must have 3 arguments",
+			Text: "Must have 2 arguments",
 		}, nil
 	}
 	withPort := true
-	if len(args) > 3 && args[3] == "noport" {
+	if len(args) > 2 && args[2] == "noport" {
 		withPort = false
 	}
 
@@ -275,7 +275,6 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 	c.splunk.ChangeUser(splunk.User{
 		ServerBaseURL: u,
 		UserName:      args[1],
-		Password:      args[2],
 	})
 
 	if err := c.splunk.Ping(); err != nil {

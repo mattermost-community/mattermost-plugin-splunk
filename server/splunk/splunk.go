@@ -40,8 +40,8 @@ type Dependencies struct {
 // User stores info about splunk user
 type User struct {
 	ServerBaseURL string
+	Token         string
 	UserName      string
-	Password      string
 }
 
 // Config Splunk configuration

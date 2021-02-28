@@ -59,7 +59,7 @@ func (s *splunk) DeleteAlert(channelID string, alertID string) error {
 
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
 	user := s.User()
-	if user.ServerBaseURL == "" || user.UserName == "" || user.Password == "" {
+	if user.ServerBaseURL == "" || user.Token == "" {
 		return nil, errors.New("unauthorized")
 	}
 
@@ -68,7 +68,7 @@ func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http
 		return nil, errors.Wrap(err, "bad request")
 	}
 
-	req.SetBasicAuth(user.UserName, user.Password)
+	req.Header.Set("Authorization", "Bearer "+user.Token)
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
