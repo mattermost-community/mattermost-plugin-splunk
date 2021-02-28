@@ -74,5 +74,10 @@ func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http
 	if err != nil {
 		return nil, errors.Wrap(err, "connection problem")
 	}
+
+	if resp.StatusCode != http.StatusOK {
+		_ = resp.Body.Close()
+		return nil, errors.New("non-ok status code")
+	}
 	return resp, err
 }

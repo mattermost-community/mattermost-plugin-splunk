@@ -272,13 +272,8 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 		}, nil
 	}
 
-	c.splunk.ChangeUser(splunk.User{
-		ServerBaseURL: u,
-		UserName:      args[1],
-	})
-
-	if err := c.splunk.Ping(); err != nil {
-		c.splunk.ChangeUser(splunk.User{})
+	err = c.splunk.ChangeUser(u, args[1])
+	if err != nil {
 		return &model.CommandResponse{
 			Text: "Wrong credentials. Try again",
 		}, nil
@@ -288,7 +283,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 }
 
 func (c *command) authLogout(_ ...string) (*model.CommandResponse, error) {
-	c.splunk.ChangeUser(splunk.User{})
+	_ = c.splunk.ChangeUser("", "")
 	return &model.CommandResponse{
 		Text: "Successful logout",
 	}, nil
