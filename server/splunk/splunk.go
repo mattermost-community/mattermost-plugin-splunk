@@ -17,8 +17,9 @@ import (
 type Splunk interface {
 	PluginAPI
 
-	User() User
-	ChangeUser(server string, id string) error
+	User() store.SplunkUser
+	LoginUser(mattermostUserID string, server string, id string) error
+	LogoutUser(mattermostUserID string) error
 
 	AddAlertListener(string, string, AlertActionFunc)
 	NotifyAll(string, AlertActionWHPayload)
@@ -32,26 +33,6 @@ type Splunk interface {
 	ListLogs() []string
 }
 
-// Dependencies contains all API dependencies
-type Dependencies struct {
-	PluginAPI
-	store.Store
-}
-
-// User stores info about splunk user
-type User struct {
-	ServerBaseURL string
-	Token         string
-	UserName      string
-}
-
-// Config Splunk configuration
-type Config struct {
-	*Dependencies
-
-	SplunkUserInfo User
-}
-
 // PluginAPI API form mattermost plugin
 type PluginAPI interface {
 	SendEphemeralPost(userID string, post *model.Post) *model.Post
@@ -63,16 +44,20 @@ type PluginAPI interface {
 }
 
 type splunk struct {
-	Config
+	PluginAPI
+	store.Store
+
 	notifier  *alertNotifier
 	botUserID string
+
+	currentUser store.SplunkUser
 
 	httpClient *http.Client
 }
 
 // New returns new Splunk API object
-func New(apiConfig Config) Splunk {
-	return newSplunk(apiConfig)
+func New(api PluginAPI, st store.Store) Splunk {
+	return newSplunk(api, st)
 }
 
 // AddBotUser registers new bot user
@@ -86,8 +71,8 @@ func (s *splunk) BotUser() string {
 }
 
 // User returns splunk user info
-func (s *splunk) User() User {
-	return s.SplunkUserInfo
+func (s *splunk) User() store.SplunkUser {
+	return s.currentUser
 }
 
 type currentUserResponse struct {
@@ -97,15 +82,7 @@ type currentUserResponse struct {
 	} `xml:"entry>content>dict>key"`
 }
 
-func (s *splunk) ChangeUser(server string, id string) error {
-	s.SplunkUserInfo = User{
-		ServerBaseURL: server,
-		Token:         id,
-	}
-	if server == "" || id == "" {
-		return errors.New("authorization")
-	}
-
+func (s *splunk) authCheck() error {
 	resp, err := s.doHTTPRequest(http.MethodGet, "/services/authentication/current-context", nil)
 	if err != nil {
 		return errors.Wrap(err, "authorization")
@@ -118,15 +95,54 @@ func (s *splunk) ChangeUser(server string, id string) error {
 	}
 	for _, r := range c.Data {
 		if r.Name == "username" {
-			s.SplunkUserInfo.UserName = r.Data
+			s.currentUser.UserName = r.Data
 		}
+	}
+
+	if s.currentUser.UserName == "" {
+		return errors.New("authorization")
 	}
 	return nil
 }
 
-func newSplunk(apiConfig Config) *splunk {
+// LoginUser changes authorized user.
+// id is either username or token of user.
+func (s *splunk) LoginUser(mattermostUserID string, server string, id string) error {
+	var isNew = true
+
+	// check if we already have token for given id
+	if u, err := s.Store.User(mattermostUserID, server, id); err == nil {
+		s.currentUser = u
+		isNew = false
+	} else {
+		s.currentUser = store.SplunkUser{
+			Server: server,
+			Token:  id,
+		}
+	}
+
+	if authErr := s.authCheck(); authErr != nil {
+		s.currentUser = store.SplunkUser{}
+		return authErr
+	}
+
+	if !isNew {
+		return nil
+	}
+
+	return s.Store.RegisterUser(mattermostUserID, s.currentUser)
+}
+
+// LogoutUser logs user out
+func (s *splunk) LogoutUser(mattermostUserID string) error {
+	s.currentUser = store.SplunkUser{}
+	return s.Store.ChangeCurrentUser(mattermostUserID, "")
+}
+
+func newSplunk(api PluginAPI, st store.Store) *splunk {
 	s := &splunk{
-		Config: apiConfig,
+		PluginAPI: api,
+		Store:     st,
 		notifier: &alertNotifier{
 			receivers:       make(map[string]AlertActionFunc),
 			alertsInChannel: make(map[string][]string),

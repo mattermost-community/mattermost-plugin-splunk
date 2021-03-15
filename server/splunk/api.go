@@ -59,11 +59,11 @@ func (s *splunk) DeleteAlert(channelID string, alertID string) error {
 
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
 	user := s.User()
-	if user.ServerBaseURL == "" || user.Token == "" {
+	if user.Server == "" || user.Token == "" {
 		return nil, errors.New("unauthorized")
 	}
 
-	req, err := http.NewRequest(method, user.ServerBaseURL+url, body)
+	req, err := http.NewRequest(method, user.Server+url, body)
 	if err != nil {
 		return nil, errors.Wrap(err, "bad request")
 	}

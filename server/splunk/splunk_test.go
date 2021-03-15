@@ -3,11 +3,23 @@ package splunk
 import (
 	"testing"
 
+	"github.com/bakurits/mattermost-plugin-splunk/server/store"
+	"github.com/bakurits/mattermost-plugin-splunk/server/store/mock"
+
+	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_splunk_ChangeUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
 	is := assert.New(t)
+	m := mock.NewMockStore(ctrl)
+
+	m.EXPECT().ChangeCurrentUser(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	m.EXPECT().RegisterUser(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	m.EXPECT().User(gomock.Any(), gomock.Any(), gomock.Any()).Return(store.SplunkUser{}, errors.New("no user found")).AnyTimes()
+	defer ctrl.Finish()
 
 	type args struct {
 		server string
@@ -37,8 +49,8 @@ func Test_splunk_ChangeUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := New(Config{})
-			err := s.ChangeUser(tt.args.server, tt.args.id)
+			s := New(nil, m)
+			err := s.LoginUser("", tt.args.server, tt.args.id)
 			if tt.wantErr && err == nil {
 				is.Fail("expected error but didn't get any")
 			}

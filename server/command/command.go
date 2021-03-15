@@ -250,7 +250,7 @@ func createMDForLogsList(results []string) string {
 
 func (c *command) authUser(_ ...string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{
-		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().ServerBaseURL, c.splunk.User().UserName),
+		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName),
 	}, nil
 }
 
@@ -272,7 +272,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 		}, nil
 	}
 
-	err = c.splunk.ChangeUser(u, args[1])
+	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
 	if err != nil {
 		return &model.CommandResponse{
 			Text: "Wrong credentials. Try again",
@@ -283,7 +283,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 }
 
 func (c *command) authLogout(_ ...string) (*model.CommandResponse, error) {
-	_ = c.splunk.ChangeUser("", "")
+	_ = c.splunk.LogoutUser(c.args.UserId)
 	return &model.CommandResponse{
 		Text: "Successful logout",
 	}, nil
