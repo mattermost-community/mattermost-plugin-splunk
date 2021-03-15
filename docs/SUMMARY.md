@@ -6,12 +6,12 @@
 
 ## Admin Guide
 
-- [System Admin Instructions](#for-mattermost-system-admins)
+- [Installation](installation.md)
 
 ## User Guide
 
 - [User Instructions](#for-users)
-- [Slash Commands](#slash-commands)
+- [Slash Commands](slash-commands.md)
 
 ## Help and Support
 
