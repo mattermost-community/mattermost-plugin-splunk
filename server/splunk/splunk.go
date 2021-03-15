@@ -18,6 +18,7 @@ type Splunk interface {
 	PluginAPI
 
 	User() store.SplunkUser
+	SyncUser(mattermostUserID string) error
 	LoginUser(mattermostUserID string, server string, id string) error
 	LogoutUser(mattermostUserID string) error
 
@@ -105,6 +106,17 @@ func (s *splunk) authCheck() error {
 	return nil
 }
 
+// SyncUser syncs user stored in KVStore with user stored in memory.
+func (s *splunk) SyncUser(mattermostUserID string) error {
+	u, err := s.Store.CurrentUser(mattermostUserID)
+	if err != nil {
+		return err
+	}
+
+	s.currentUser = u
+	return nil
+}
+
 // LoginUser changes authorized user.
 // id is either username or token of user.
 func (s *splunk) LoginUser(mattermostUserID string, server string, id string) error {
@@ -133,7 +145,7 @@ func (s *splunk) LoginUser(mattermostUserID string, server string, id string) er
 	return s.Store.RegisterUser(mattermostUserID, s.currentUser)
 }
 
-// LogoutUser logs user out
+// LogoutUser logs user out.
 func (s *splunk) LogoutUser(mattermostUserID string) error {
 	s.currentUser = store.SplunkUser{}
 	return s.Store.ChangeCurrentUser(mattermostUserID, "")

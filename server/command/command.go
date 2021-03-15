@@ -108,6 +108,12 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 		config: conf,
 		splunk: a,
 	}
+
+	err := a.SyncUser(args.UserId)
+	if err != nil {
+		log.Printf("Error occured while syncing user stored in KVStore :%v\n", err)
+	}
+
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
