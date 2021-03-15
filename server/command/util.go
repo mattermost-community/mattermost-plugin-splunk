@@ -23,7 +23,7 @@ func parseServerURL(u string, withPort bool) (string, error) {
 		host = host[:i]
 	}
 	if withPort {
-		host = host + ":8089"
+		host += ":8089"
 	}
 
 	return ur.Scheme + "://" + host, nil
