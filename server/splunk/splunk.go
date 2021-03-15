@@ -138,11 +138,11 @@ func (s *splunk) LoginUser(mattermostUserID string, server string, id string) er
 		return authErr
 	}
 
-	if !isNew {
-		return nil
+	if isNew {
+		return s.Store.RegisterUser(mattermostUserID, s.currentUser)
 	}
 
-	return s.Store.RegisterUser(mattermostUserID, s.currentUser)
+	return s.Store.ChangeCurrentUser(mattermostUserID, s.currentUser.UserName)
 }
 
 // LogoutUser logs user out.
