@@ -1,7 +1,6 @@
 package splunk
 
 import (
-	"crypto/tls"
 	"encoding/xml"
 	"log"
 	"net/http"
@@ -160,11 +159,7 @@ func newSplunk(api PluginAPI, st store.Store) *splunk {
 			alertsInChannel: make(map[string][]string),
 			lock:            &sync.Mutex{},
 		},
-		httpClient: &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		},
+		httpClient: http.DefaultClient,
 	}
 
 	return s
