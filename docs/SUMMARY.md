@@ -10,6 +10,9 @@
 
 ## Help and Support
 
+- [Help and Support](help-and-support.md)
+
 ## Development
 
-- [Developer/Contributor Instructions](development.md)
+- [Environment](development.md)
+- [Help Wanted!](help-wanted.md)
