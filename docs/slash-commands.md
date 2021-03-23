@@ -5,7 +5,8 @@
     ![GitHub plugin screenshot](../images/auth_success.png)
 
 * **Get list of all logs from the Splunk server:** Use `/splunk log --list`.
-    ![GitHub plugin screenshot](images/log_list.png)
+
+    ![GitHub plugin screenshot](../images/log_list.png)
 
 * **Get specific log from server:** Use `/splunk log [logname]`.
 
