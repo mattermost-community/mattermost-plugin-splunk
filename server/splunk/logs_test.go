@@ -11,6 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var authToken = "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiIsInR0eXAiOiJzdGF0aWMifQ.eyJpc3MiOiJzcGx1bmtfYWRtaW4gZnJvbSB1YnVudHUtcy0xdmNwdS0xZ2ItZnJhMS0wMSIsInN1YiI6InNwbHVua19hZG1pbiIsImF1ZCI6Im1hdHRlcm1vc3QgcGx1Z2luIiwiaWRwIjoiU3BsdW5rIiwianRpIjoiM2JkNWZiNThlYmM5NGY5ODUwM2VkNjY0ZDYyMTAyMmM2OGVlMDM3NWU2MjgzMDc0ODcwNjE5OTNmNDJlMjQzOSIsImlhdCI6MTYxNjY2MTAwMiwiZXhwIjoxNjIyNzA5MDAyLCJuYnIiOjE2MTY2NjEwMDJ9.4KEIkoHOBiTtoXZ6lCM-4huE4grzBA2BcFR_MxtU8Vf5rza4lFCEPKfX0_TzNsUFsRIAypy6yLCUgKdYRQ8T4Q"
+var server = "https://splunkapi.opsolutions.dev"
+
 func Test_splunk_Logs(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
@@ -31,8 +34,8 @@ func Test_splunk_Logs(t *testing.T) {
 			name: "",
 			fields: fields{
 				User: store.SplunkUser{
-					Server: "https://207.154.235.95:8089",
-					Token:  "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiIsInR0eXAiOiJzdGF0aWMifQ.eyJpc3MiOiJzcGx1bmtfYWRtaW4gZnJvbSB1YnVudHUtcy0xdmNwdS0xZ2ItZnJhMS0wMSIsInN1YiI6InNwbHVua19hZG1pbiIsImF1ZCI6ImdnIiwiaWRwIjoiU3BsdW5rIiwianRpIjoiMzIzOGFhNDA4MDkxNTI5MDkzMDZhNzYxYTk5MWQ5YjEzZjZkNmE5YmI1ZmMzZGM0NTA5MzhmNjY2MDgyODY1NSIsImlhdCI6MTYxNDUwODYyNywiZXhwIjoxNjE3MTAwNjI3LCJuYnIiOjE2MTQ1MDg2Mjd9.UPOpCe3zsi_dZ3P6GomfRGklVL-ef8DyMXH0DAUPMzp3xAUKp_EFxRbguslCbJ0dU1e6O_DpXzzINSaEKlsWqw",
+					Server: server,
+					Token:  authToken,
 				},
 			},
 		},
@@ -68,8 +71,8 @@ func Test_splunk_ListLogs(t *testing.T) {
 			name: "",
 			fields: fields{
 				User: store.SplunkUser{
-					Server: "https://207.154.235.95:8089",
-					Token:  "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiIsInR0eXAiOiJzdGF0aWMifQ.eyJpc3MiOiJzcGx1bmtfYWRtaW4gZnJvbSB1YnVudHUtcy0xdmNwdS0xZ2ItZnJhMS0wMSIsInN1YiI6InNwbHVua19hZG1pbiIsImF1ZCI6ImdnIiwiaWRwIjoiU3BsdW5rIiwianRpIjoiMzIzOGFhNDA4MDkxNTI5MDkzMDZhNzYxYTk5MWQ5YjEzZjZkNmE5YmI1ZmMzZGM0NTA5MzhmNjY2MDgyODY1NSIsImlhdCI6MTYxNDUwODYyNywiZXhwIjoxNjE3MTAwNjI3LCJuYnIiOjE2MTQ1MDg2Mjd9.UPOpCe3zsi_dZ3P6GomfRGklVL-ef8DyMXH0DAUPMzp3xAUKp_EFxRbguslCbJ0dU1e6O_DpXzzINSaEKlsWqw",
+					Server: server,
+					Token:  authToken,
 				},
 			},
 		},
