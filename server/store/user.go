@@ -87,15 +87,18 @@ found:
 
 // RegisterUser registers new splunk user
 // if user with given username already exists than it will be overwritten.
-func (s *pluginStore) RegisterUser(mattermostUserID string, user SplunkUser) error {
+func (s *pluginStore) RegisterUser(mattermostUserID string, splunkUser SplunkUser) error {
 	su, err := s.loadUser(mattermostUserID)
 	if err != nil {
-		return err
+		su = &user{
+			LastLoginUserName: "",
+			SplunkUsers:       []SplunkUser{},
+		}
 	}
 
 	ind := -1
 	for i, u := range su.SplunkUsers {
-		if u.UserName == user.UserName {
+		if u.UserName == splunkUser.UserName {
 			ind = i
 			break
 		}
@@ -104,8 +107,8 @@ func (s *pluginStore) RegisterUser(mattermostUserID string, user SplunkUser) err
 		su.SplunkUsers = append(su.SplunkUsers[:ind], su.SplunkUsers[ind+1:]...)
 	}
 
-	su.SplunkUsers = append(su.SplunkUsers, user)
-	return nil
+	su.SplunkUsers = append(su.SplunkUsers, splunkUser)
+	return s.storeUser(mattermostUserID, su)
 }
 
 func (s *pluginStore) loadUser(mattermostUserID string) (*user, error) {
