@@ -266,12 +266,8 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 			Text: "Must have 2 arguments",
 		}, nil
 	}
-	withPort := true
-	if len(args) > 2 && args[2] == "noport" {
-		withPort = false
-	}
 
-	u, err := parseServerURL(args[0], withPort)
+	u, err := parseServerURL(args[0])
 	if err != nil {
 		return &model.CommandResponse{
 			Text: "Bad server URL",
