@@ -17,7 +17,7 @@ const (
 	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
 	helpText       = `
 * /splunk help - print this help message
-* /splunk auth --login [server base url] [username] [password] - log into the splunk server
+* /splunk auth --login [server base url] [username/token] - log into the splunk server
 * /splunk alert --subscribe - subscribe to alerts
 * /splunk log --list - list names of logs on server
 * /splunk log [logname] - show specific log from server
