@@ -117,8 +117,8 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
-			"alert/--list":      c.subscribeAlert,
-			"alert/--delete":    c.subscribeAlert,
+			"alert/--list":      c.listAlert,
+			"alert/--delete":    c.deleteAlert,
 
 			"log":        c.getLogs,
 			"log/--list": c.getLogSourceList,
