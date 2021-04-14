@@ -63,6 +63,20 @@ func (mr *MockStoreMockRecorder) CurrentUser(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentUser", reflect.TypeOf((*MockStore)(nil).CurrentUser), arg0)
 }
 
+// DeleteUser mocks base method.
+func (m *MockStore) DeleteUser(arg0, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUser indicates an expected call of DeleteUser.
+func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1, arg2)
+}
+
 // RegisterUser mocks base method.
 func (m *MockStore) RegisterUser(arg0 string, arg1 store.SplunkUser) error {
 	m.ctrl.T.Helper()

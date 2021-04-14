@@ -16,6 +16,7 @@ type UserStore interface {
 
 	ChangeCurrentUser(mattermostUserID string, userName string) error
 	RegisterUser(mattermostUserID string, user SplunkUser) error
+	DeleteUser(mattermostUserID string, server string, userName string) error
 }
 
 // SplunkUser stores splunk user info.
@@ -108,6 +109,27 @@ func (s *pluginStore) RegisterUser(mattermostUserID string, splunkUser SplunkUse
 	}
 
 	su.SplunkUsers = append(su.SplunkUsers, splunkUser)
+	return s.storeUser(mattermostUserID, su)
+}
+
+// DeleteUser deletes user from KV store
+func (s *pluginStore) DeleteUser(mattermostUserID string, server string, userName string) error {
+	su, err := s.loadUser(mattermostUserID)
+	if err != nil {
+		return errors.Wrap(err, "no user found")
+	}
+
+	ind := -1
+	for i, u := range su.SplunkUsers {
+		if u.Server == server && u.UserName == userName {
+			ind = i
+			break
+		}
+	}
+	if ind != -1 {
+		su.SplunkUsers = append(su.SplunkUsers[:ind], su.SplunkUsers[ind+1:]...)
+	}
+
 	return s.storeUser(mattermostUserID, su)
 }
 

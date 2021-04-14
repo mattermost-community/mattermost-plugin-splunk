@@ -146,8 +146,10 @@ func (s *splunk) LoginUser(mattermostUserID string, server string, id string) er
 
 // LogoutUser logs user out.
 func (s *splunk) LogoutUser(mattermostUserID string) error {
+	_ = s.Store.ChangeCurrentUser(mattermostUserID, "")
+	err := s.Store.DeleteUser(mattermostUserID, s.currentUser.Server, s.currentUser.UserName)
 	s.currentUser = store.SplunkUser{}
-	return s.Store.ChangeCurrentUser(mattermostUserID, "")
+	return err
 }
 
 func newSplunk(api PluginAPI, st store.Store) *splunk {
