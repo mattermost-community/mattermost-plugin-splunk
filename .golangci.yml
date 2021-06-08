@@ -6,7 +6,7 @@ linters-settings:
   gofmt:
     simplify: true
   goimports:
-    local-prefixes: github.com/mattermost/mattermost-starter-template
+    local-prefixes: github.com/bakurits/mattermost-plugin-splunk
   golint:
     min-confidence: 0
   govet:
@@ -25,7 +25,7 @@ linters:
     - gofmt
     - goimports
     - golint
-    - gosec
+    #     - gosec
     - gosimple
     - govet
     - ineffassign
@@ -36,7 +36,7 @@ linters:
     - stylecheck
     - typecheck
     - unconvert
-    - unused
+    #    - unused
     - varcheck
     - whitespace
 
