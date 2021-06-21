@@ -2,8 +2,7 @@
 **Maintainer:** [@dbejanishvili](https://github.com/dbejanishvili)
 **Co-Maintainers:** [@bakurits](https://github.com/bakurits) [@Gvantsats](https://github.com/Gvantsats)
 
-Splunk integration for mattermost. Enabling users to get logs and alerts from splunk server.
-To learn more about Mattermost plugins, see [Mattermost plugin documentation](https://developers.mattermost.com/extend/plugins/).
+A Splunk integration for Mattermost which enables users to get logs and alerts from Splunk server. To learn more about installing and using this plugin, see [the plugin documentation](https://mattermost.gitbook.io/splunk-plugin/).
 
 ## License
 
