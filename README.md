@@ -11,4 +11,4 @@ This repository is licensed under the [Apache 2.0 License](https://github.com/ba
 
 ## Contributing
 
-Visit our [Development guide](https://mattermost.gitbook.io/circle-ci-plugin/contributing/development) for information about how to contribute to this plugin.
+Visit our [Development guide](https://mattermost.gitbook.io/splunk-plugin/development/development) for information about how to contribute to this plugin.
