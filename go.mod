@@ -3,6 +3,7 @@ module github.com/bakurits/mattermost-plugin-splunk
 go 1.12
 
 require (
+	github.com/golang/mock v1.2.0
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.8.0
 	github.com/mattermost/mattermost-server/v5 v5.3.2-0.20200723144633-ed34468996e6

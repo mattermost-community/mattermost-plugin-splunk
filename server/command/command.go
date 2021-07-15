@@ -17,7 +17,7 @@ const (
 	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
 	helpText       = `
 * /splunk help - print this help message
-* /splunk auth --login [server base url] [username] [password] - log into the splunk server
+* /splunk auth --login [server base url] [username/token] - log into the splunk server
 * /splunk alert --subscribe - subscribe to alerts
 * /splunk log --list - list names of logs on server
 * /splunk log [logname] - show specific log from server
@@ -108,11 +108,17 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 		config: conf,
 		splunk: a,
 	}
+
+	err := a.SyncUser(args.UserId)
+	if err != nil {
+		log.Printf("Error occurred while syncing user stored in KVStore :%v\n", err)
+	}
+
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
 			"alert/--subscribe": c.subscribeAlert,
-			"alert/--list":      c.subscribeAlert,
-			"alert/--delete":    c.subscribeAlert,
+			"alert/--list":      c.listAlert,
+			"alert/--delete":    c.deleteAlert,
 
 			"log":        c.getLogs,
 			"log/--list": c.getLogSourceList,
@@ -250,36 +256,26 @@ func createMDForLogsList(results []string) string {
 
 func (c *command) authUser(_ ...string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{
-		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().ServerBaseURL, c.splunk.User().UserName),
+		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName),
 	}, nil
 }
 
 func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
-	if len(args) < 3 {
+	if len(args) < 2 {
 		return &model.CommandResponse{
-			Text: "Must have 3 arguments",
+			Text: "Must have 2 arguments",
 		}, nil
 	}
-	withPort := true
-	if len(args) > 3 && args[3] == "noport" {
-		withPort = false
-	}
 
-	u, err := parseServerURL(args[0], withPort)
+	u, err := parseServerURL(args[0])
 	if err != nil {
 		return &model.CommandResponse{
 			Text: "Bad server URL",
 		}, nil
 	}
 
-	c.splunk.ChangeUser(splunk.User{
-		ServerBaseURL: u,
-		UserName:      args[1],
-		Password:      args[2],
-	})
-
-	if err := c.splunk.Ping(); err != nil {
-		c.splunk.ChangeUser(splunk.User{})
+	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
+	if err != nil {
 		return &model.CommandResponse{
 			Text: "Wrong credentials. Try again",
 		}, nil
@@ -289,7 +285,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 }
 
 func (c *command) authLogout(_ ...string) (*model.CommandResponse, error) {
-	c.splunk.ChangeUser(splunk.User{})
+	_ = c.splunk.LogoutUser(c.args.UserId)
 	return &model.CommandResponse{
 		Text: "Successful logout",
 	}, nil

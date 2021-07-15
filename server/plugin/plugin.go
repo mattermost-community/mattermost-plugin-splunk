@@ -44,12 +44,7 @@ func NewWithStore(store store.Store, conf *config.Config) Plugin {
 		config:            conf,
 	}
 
-	p.sp = splunk.New(splunk.Config{
-		Dependencies: &splunk.Dependencies{
-			Store:     store,
-			PluginAPI: p,
-		},
-	})
+	p.sp = splunk.New(p, store)
 	p.httpHandler = api.NewHTTPHandler(p.sp)
 	return p
 }
@@ -72,12 +67,7 @@ func (p *plugin) OnActivate() error {
 
 	if p.sp == nil {
 		pluginStore := store.NewPluginStore(p)
-		p.sp = splunk.New(splunk.Config{
-			Dependencies: &splunk.Dependencies{
-				Store:     pluginStore,
-				PluginAPI: p,
-			},
-		})
+		p.sp = splunk.New(p, pluginStore)
 		p.httpHandler = api.NewHTTPHandler(p.sp)
 	}
 

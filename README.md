@@ -26,7 +26,8 @@ You can install the plugin from mattermost plugin marketplace, or follow the ins
 
 ## **For Users**
 ### Slash Commands
-* __Authenticate user__ - use `/splunk auth --login [server base url] [username] [password] ` you must be logged into the system before you use any slash commands regarding logging. To authenticate user you can use this slash command with three required parameters splunk server base url, splunk username and password. After successful authentication this message is shown:
+* __Authenticate user__ - use `/splunk auth --login [server base url] [username/token]` you must be logged into the system before you use any slash commands regarding logging. To authenticate the user you can use this slash command with two required parameters Splunk server base URL, Splunk username, or token.
+  If you already logged in to a plugin with a token, the second and next logins can be done with username too. After successful authentication this message is shown:
 
     ![GitHub plugin screenshot](images/auth_success.png)
 
