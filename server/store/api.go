@@ -1,7 +1,8 @@
 package store
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -25,7 +26,7 @@ type store struct {
 	api API
 }
 
-// NewPluginStore creates KVStore from plugin.API
+// NewStore creates KVStore from plugin.API
 func NewStore(api API) KVStore {
 	return &store{
 		api: api,
@@ -59,20 +60,21 @@ func (s *store) Delete(key string) error {
 	return nil
 }
 
-// LoadJSON load json data from KVStore
-func LoadJSON(s KVStore, key string, v interface{}) (returnErr error) {
+// LoadGOB load json data from KVStore
+func LoadGOB(s KVStore, key string, v interface{}) (returnErr error) {
 	data, err := s.Load(key)
 	if err != nil {
 		return errors.Wrap(err, "Error while loading json")
 	}
-	return json.Unmarshal(data, v)
+	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(v)
 }
 
-// SetJSON sets json data in KVStore
-func SetJSON(s KVStore, key string, v interface{}) (returnErr error) {
-	data, err := json.Marshal(v)
+// SetGOB sets json data in KVStore
+func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
+	data := bytes.Buffer{}
+	err := gob.NewEncoder(&data).Encode(v)
 	if err != nil {
 		return errors.Wrap(err, "Error while storing json")
 	}
-	return s.Store(key, data)
+	return s.Store(key, data.Bytes())
 }
