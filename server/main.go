@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/bakurits/mattermost-plugin-splunk/server/config"
-	splunk "github.com/bakurits/mattermost-plugin-splunk/server/plugin"
+	"github.com/mattermost/mattermost-plugin-splunk/server/config"
+	splunk "github.com/mattermost/mattermost-plugin-splunk/server/plugin"
 
 	mattermost "github.com/mattermost/mattermost-server/v5/plugin"
 )

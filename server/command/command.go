@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/bakurits/mattermost-plugin-splunk/server/api"
-	"github.com/bakurits/mattermost-plugin-splunk/server/config"
-	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
+	"github.com/mattermost/mattermost-plugin-splunk/server/api"
+	"github.com/mattermost/mattermost-plugin-splunk/server/config"
+	"github.com/mattermost/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/google/uuid"
 	"github.com/mattermost/mattermost-server/v5/model"

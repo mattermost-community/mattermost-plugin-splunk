@@ -6,7 +6,7 @@ linters-settings:
   gofmt:
     simplify: true
   goimports:
-    local-prefixes: github.com/bakurits/mattermost-plugin-splunk
+    local-prefixes: github.com/mattermost/mattermost-plugin-splunk
   golint:
     min-confidence: 0
   govet:

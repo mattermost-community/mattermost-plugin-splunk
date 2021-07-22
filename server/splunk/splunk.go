@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/bakurits/mattermost-plugin-splunk/server/store"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
