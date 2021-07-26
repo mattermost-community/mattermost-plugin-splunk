@@ -91,8 +91,7 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 	mattermostUserID := commandArgs.UserId
 	if len(mattermostUserID) == 0 {
 		errorMsg := "Not authorized"
-		p.sendEphemeralResponse(commandArgs, errorMsg)
-		return &model.CommandResponse{}, &model.AppError{Message: errorMsg}
+		return p.sendEphemeralResponse(commandArgs, errorMsg), &model.AppError{Message: errorMsg}
 	}
 
 	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp)
@@ -100,27 +99,25 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 
 	commandResponse, err := commandHandler.Handle(args...)
 	if err == nil {
-		p.sendEphemeralResponse(commandArgs, commandResponse.Text)
-		return commandResponse, nil
+		return p.sendEphemeralResponse(commandArgs, commandResponse.Text), nil
 	}
 
 	if appError, ok := err.(*model.AppError); ok {
-		p.sendEphemeralResponse(commandArgs, commandResponse.Text)
-		return commandResponse, appError
+		return p.sendEphemeralResponse(commandArgs, commandResponse.Text), appError
 	}
 
-	p.sendEphemeralResponse(commandArgs, err.Error())
-	return commandResponse, &model.AppError{
+	return p.sendEphemeralResponse(commandArgs, err.Error()), &model.AppError{
 		Message: err.Error(),
 	}
 }
 
-func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) {
+func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
 	p.API.SendEphemeralPost(args.UserId, &model.Post{
 		UserId:    p.sp.BotUser(),
 		ChannelId: args.ChannelId,
 		Message:   text,
 	})
+	return &model.CommandResponse{}
 }
 
 // OnConfigurationChange is invoked when Config changes may have been made.
