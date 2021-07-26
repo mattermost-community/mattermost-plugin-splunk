@@ -90,7 +90,9 @@ func (p *plugin) OnActivate() error {
 func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	mattermostUserID := commandArgs.UserId
 	if len(mattermostUserID) == 0 {
-		return &model.CommandResponse{}, &model.AppError{Message: "Not authorized"}
+		errorMsg := "Not authorized"
+		p.sendEphemeralResponse(commandArgs, errorMsg)
+		return &model.CommandResponse{}, &model.AppError{Message: errorMsg}
 	}
 
 	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp)
@@ -98,16 +100,27 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 
 	commandResponse, err := commandHandler.Handle(args...)
 	if err == nil {
+		p.sendEphemeralResponse(commandArgs, commandResponse.Text)
 		return commandResponse, nil
 	}
 
 	if appError, ok := err.(*model.AppError); ok {
+		p.sendEphemeralResponse(commandArgs, commandResponse.Text)
 		return commandResponse, appError
 	}
 
+	p.sendEphemeralResponse(commandArgs, err.Error())
 	return commandResponse, &model.AppError{
 		Message: err.Error(),
 	}
+}
+
+func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) {
+	p.API.SendEphemeralPost(args.UserId, &model.Post{
+		UserId:    p.sp.BotUser(),
+		ChannelId: args.ChannelId,
+		Message:   text,
+	})
 }
 
 // OnConfigurationChange is invoked when Config changes may have been made.
