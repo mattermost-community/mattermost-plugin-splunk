@@ -109,11 +109,11 @@ func createlogCommand() *model.AutocompleteData {
 		"log", "[--list / logname]", "")
 
 	flag := []model.AutocompleteListItem{
-		{HelpText: "list all the log group", Item: "--list"},
+		{HelpText: "List all the log group", Item: "--list"},
 	}
 
-	log.AddStaticListArgument("list all the log group", false, flag)
-	log.AddTextArgument("[logname]", "show specific log from server", "")
+	log.AddStaticListArgument("List all the log group", false, flag)
+	log.AddTextArgument("[logname]", "Show specific log from server", "")
 
 	return log
 }
