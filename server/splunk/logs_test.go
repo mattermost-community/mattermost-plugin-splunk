@@ -15,6 +15,7 @@ var authToken = "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiI
 var server = "https://splunkapi.opsolutions.dev"
 
 func Test_splunk_Logs(t *testing.T) {
+	t.Skip()
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
 	m := mock.NewMockStore(ctrl)
