@@ -12,6 +12,7 @@ import (
 )
 
 func Test_splunk_ChangeUser(t *testing.T) {
+	t.Skip("GH-48 issue link https://github.com/mattermost/mattermost-plugin-splunk/issues/48")
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
 	m := mock.NewMockStore(ctrl)
