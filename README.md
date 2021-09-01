@@ -6,7 +6,7 @@ A Splunk integration for Mattermost which enables users to get logs and alerts f
 
 ## License
 
-This repository is licensed under the [Apache 2.0 License](https://github.com/bakurits/mattermost-plugin-anonymous/blob/master/LICENSE).
+This repository is licensed under the [Apache 2.0 License](https://github.com/mattermost/mattermost-plugin-starter-template/blob/master/LICENSE).
 
 ## Contributing
 
