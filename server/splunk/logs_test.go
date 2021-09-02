@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bakurits/mattermost-plugin-splunk/server/store"
-	"github.com/bakurits/mattermost-plugin-splunk/server/store/mock"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

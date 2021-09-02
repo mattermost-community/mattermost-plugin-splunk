@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Github Repository Link
-GH_REPO=github.com/bakurits/mattermost-plugin-splunk
+GH_REPO=github.com/mattermost/mattermost-plugin-splunk
 
 # Array of (package,interface) tuples
 # If new element needs to be added, please delimit package and interface by colon like other elements
