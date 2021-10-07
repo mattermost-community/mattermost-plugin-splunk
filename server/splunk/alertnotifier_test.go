@@ -54,18 +54,20 @@ func Test_alertNotifier_delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			a := &alertNotifier{
-				receivers:       tt.fields.receivers,
-				alertsInChannel: tt.fields.alertsInChannel,
-				lock:            tt.fields.lock,
+			s := &splunk{
+				notifier: &alertNotifier{
+					receivers:       tt.fields.receivers,
+					alertsInChannel: tt.fields.alertsInChannel,
+					lock:            tt.fields.lock,
+				},
 			}
 			for _, arg := range tt.args.data {
-				if err := a.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {
+				if err := s.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {
 					t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
 
-			t.Log(a.list("gg"))
+			t.Log(s.list("gg"))
 		})
 	}
 }

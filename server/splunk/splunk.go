@@ -21,9 +21,9 @@ type Splunk interface {
 	LoginUser(mattermostUserID string, server string, id string) error
 	LogoutUser(mattermostUserID string) error
 
-	AddAlertListener(string, string, AlertActionFunc)
+	AddAlertListener(string, string, AlertActionFunc) error
 	NotifyAll(string, AlertActionWHPayload)
-	ListAlert(string) []string
+	ListAlert(string) ([]string, error)
 	DeleteAlert(string, string) error
 
 	AddBotUser(string)
@@ -40,6 +40,8 @@ type PluginAPI interface {
 
 	GetUsersInChannel(channelID, sortBy string, page, perPage int) ([]*model.User, error)
 	PublishWebSocketEvent(event string, payload map[string]interface{}, broadcast *model.WebsocketBroadcast)
+	// GetSubscription(key string) (map[string][]string, error)
+	// SetSubscription(key string, subscription map[string][]string) error
 	store.API
 }
 

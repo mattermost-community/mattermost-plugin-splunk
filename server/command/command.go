@@ -108,7 +108,7 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 		config: conf,
 		splunk: a,
 	}
-
+	log.Printf(args.UserId, "======================================")
 	err := a.SyncUser(args.UserId)
 	if err != nil {
 		log.Printf("Error occurred while syncing user stored in KVStore :%v\n", err)
@@ -164,8 +164,12 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 }
 
 func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
+	list, err := c.splunk.ListAlert(c.args.ChannelId)
+	if err != nil {
+		return nil, err
+	}
 	return &model.CommandResponse{
-		Text: createMDForLogsList(c.splunk.ListAlert(c.args.ChannelId)),
+		Text: createMDForLogsList(list),
 	}, nil
 }
 

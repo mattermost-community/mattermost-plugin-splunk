@@ -15,6 +15,8 @@ func Test_splunk_ChangeUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
 	m := mock.NewMockStore(ctrl)
+	m.EXPECT().GetSubscription(gomock.Any()).Return(map[string][]interface{}{}, nil).AnyTimes()
+	m.EXPECT().SetSubscription(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 	m.EXPECT().ChangeCurrentUser(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	m.EXPECT().RegisterUser(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()

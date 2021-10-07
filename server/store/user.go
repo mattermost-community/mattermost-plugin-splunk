@@ -1,6 +1,7 @@
 package store
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -17,6 +18,8 @@ type UserStore interface {
 	ChangeCurrentUser(mattermostUserID string, userName string) error
 	RegisterUser(mattermostUserID string, user SplunkUser) error
 	DeleteUser(mattermostUserID string, server string, userName string) error
+	GetSubscription(key string) (map[string][]string, error)
+	SetSubscription(key string, subscription map[string][]string) error
 }
 
 // SplunkUser stores splunk user info.
@@ -151,4 +154,25 @@ func (s *pluginStore) storeUser(mattermostUserID string, u *user) error {
 		return errors.Wrap(err, "error while storing user")
 	}
 	return nil
+}
+
+func (s *pluginStore) GetSubscription(key string) (map[string][]string, error) {
+	var subscriptions map[string][]string
+	subscriptionByte, appErr := s.userStore.Load(key)
+	if appErr != nil {
+		return subscriptions, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
+	}
+	err := json.Unmarshal(subscriptionByte, &subscriptions)
+	if err != nil {
+		return subscriptions, errors.Wrap(err, "Error While Decoding The Subscriptions")
+	}
+	return subscriptions, nil
+}
+
+func (s *pluginStore) SetSubscription(key string, subscription map[string][]string) error {
+	value, err := json.Marshal(subscription)
+	if err != nil {
+		return errors.Wrap(err, "Error While Encoding The Subscriptions")
+	}
+	return s.userStore.Store(key, value)
 }
