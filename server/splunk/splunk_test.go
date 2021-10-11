@@ -3,8 +3,8 @@ package splunk
 import (
 	"testing"
 
-	"github.com/bakurits/mattermost-plugin-splunk/server/store"
-	"github.com/bakurits/mattermost-plugin-splunk/server/store/mock"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
@@ -12,6 +12,7 @@ import (
 )
 
 func Test_splunk_ChangeUser(t *testing.T) {
+	t.Skip("GH-48 issue link https://github.com/mattermost/mattermost-plugin-splunk/issues/48")
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
 	m := mock.NewMockStore(ctrl)

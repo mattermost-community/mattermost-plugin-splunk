@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/bakurits/mattermost-plugin-splunk/server/api"
-	"github.com/bakurits/mattermost-plugin-splunk/server/config"
-	"github.com/bakurits/mattermost-plugin-splunk/server/splunk"
+	"github.com/mattermost/mattermost-plugin-splunk/server/api"
+	"github.com/mattermost/mattermost-plugin-splunk/server/config"
+	"github.com/mattermost/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/google/uuid"
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -49,14 +49,73 @@ func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) H
 
 // GetSlashCommand returns command to register
 func GetSlashCommand() *model.Command {
+	splunk := model.NewAutocompleteData(
+		slashCommandName, "[alert|auth|help|log]", "connect to and interact with splunk.")
+	addSubCommands(splunk)
+
 	return &model.Command{
 		Trigger:          slashCommandName,
 		DisplayName:      slashCommandName,
 		Description:      pluginDescription,
 		AutoComplete:     true,
+		AutocompleteData: splunk,
 		AutoCompleteDesc: autoCompleteDescription,
 		AutoCompleteHint: autoCompleteHint,
 	}
+}
+
+func addSubCommands(splunk *model.AutocompleteData) {
+	splunk.AddCommand(createAlertCommand())
+	splunk.AddCommand(createAuthCommand())
+	splunk.AddCommand(createHelpCommand())
+	splunk.AddCommand(createlogCommand())
+}
+
+func createAlertCommand() *model.AutocompleteData {
+	alert := model.NewAutocompleteData(
+		"alert", "--subscribe", "subscribe to alert")
+
+	flag := []model.AutocompleteListItem{
+		{HelpText: "Subscribe", Item: "--subscribe"},
+	}
+	alert.AddStaticListArgument("Subscribe to alert", true, flag)
+	return alert
+}
+
+func createAuthCommand() *model.AutocompleteData {
+	auth := model.NewAutocompleteData(
+		"auth", "--login [server base url] [username/token]", "log into the splunk server")
+
+	flag := []model.AutocompleteListItem{
+		{HelpText: "Login to splunk server", Item: "--login"},
+	}
+
+	auth.AddStaticListArgument("Login to splunk server [server base url] [username/token]", true, flag)
+	auth.AddTextArgument("[server base url]", "Enter the server URL, e.g. https://your-mattermost-url.com", "")
+	auth.AddTextArgument("[username/token]", "Enter the [username/token]", "")
+
+	return auth
+}
+
+func createHelpCommand() *model.AutocompleteData {
+	help := model.NewAutocompleteData(
+		"help", "Display slash command help text", "")
+
+	return help
+}
+
+func createlogCommand() *model.AutocompleteData {
+	log := model.NewAutocompleteData(
+		"log", "[--list / logname]", "")
+
+	flag := []model.AutocompleteListItem{
+		{HelpText: "List all the log group", Item: "--list"},
+	}
+
+	log.AddStaticListArgument("List all the log group", false, flag)
+	log.AddTextArgument("[logname]", "Show specific log from server", "")
+
+	return log
 }
 
 func (c *command) Handle(args ...string) (*model.CommandResponse, error) {

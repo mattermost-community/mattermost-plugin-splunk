@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bakurits/mattermost-plugin-splunk/server/store"
-	"github.com/bakurits/mattermost-plugin-splunk/server/store/mock"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -15,6 +15,7 @@ var authToken = "eyJraWQiOiJzcGx1bmsuc2VjcmV0IiwiYWxnIjoiSFM1MTIiLCJ2ZXIiOiJ2MiI
 var server = "https://splunkapi.opsolutions.dev"
 
 func Test_splunk_Logs(t *testing.T) {
+	t.Skip("GH-47 issue link https://github.com/mattermost/mattermost-plugin-splunk/issues/47")
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
 	m := mock.NewMockStore(ctrl)
