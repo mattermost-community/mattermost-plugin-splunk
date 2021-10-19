@@ -209,7 +209,7 @@ func alertSubscriptionMessage(siteURL string) (string, string) {
 
 func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	message, id := alertSubscriptionMessage(c.args.SiteURL)
-	c.splunk.AddAlertListener(c.args.ChannelId, id, func(payload splunk.AlertActionWHPayload) {
+	err := c.splunk.AddAlertListener(c.args.ChannelId, id, func(payload splunk.AlertActionWHPayload) {
 		_, err := c.splunk.CreatePost(&model.Post{
 			UserId:    c.splunk.BotUser(),
 			ChannelId: c.args.ChannelId,
@@ -219,6 +219,9 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 			log.Println(err)
 		}
 	})
+	if err != nil {
+		message = err.Error()
+	}
 	return c.postCommandResponse(message), nil
 }
 
@@ -340,7 +343,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
 	if err != nil {
 		return &model.CommandResponse{
-			Text: "Wrong credentials. Try again",
+			Text: "Wrong credentials. Try again appending error: " + err.Error(),
 		}, nil
 	}
 
