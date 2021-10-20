@@ -61,7 +61,6 @@ func (s *splunk) list(channelID string) ([]string, error) {
 }
 
 func (s *splunk) delete(channelID string, alertID string) error {
-
 	defer s.notifier.lock.Unlock()
 	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
 	if err != nil {
