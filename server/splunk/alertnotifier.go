@@ -1,7 +1,6 @@
 package splunk
 
 import (
-	"log"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -34,12 +33,9 @@ func (s *splunk) addAlertActionFunc(channelID string, alertID string, f AlertAct
 	}
 	s.notifier.alertsInChannel[channelID] = append(s.notifier.alertsInChannel[channelID], alertID)
 	err = s.Store.SetSubscription(SplunkSubscriptionsKey, s.notifier.alertsInChannel)
-	log.Println("========================Got Error KV STORE While Storing  ==========================", err)
-
 	if err != nil {
 		return errors.Wrap(err, "error in storing subscription")
 	}
-	log.Println("========================stored into KV STORE ==========================")
 	return nil
 }
 
