@@ -38,9 +38,7 @@ func (s *store) Load(key string) ([]byte, error) {
 	if appErr != nil {
 		return nil, errors.WithMessage(appErr, "failed plugin KVGet")
 	}
-	if data == nil {
-		return nil, errors.New("error while loading data from KVStore")
-	}
+
 	return data, nil
 }
 

@@ -21,12 +21,12 @@ func (s *splunk) addAlertActionFunc(channelID string, alertID string, f AlertAct
 	s.notifier.lock.Lock()
 	defer s.notifier.lock.Unlock()
 	s.notifier.receivers[alertID] = f
-	log.Println("========================setting into KV STORE ==========================")
 	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
-	log.Println("========================Got Error KV STORE ==========================", err)
-
 	if err != nil {
 		return errors.Wrap(err, "error in getting subscription")
+	}
+	if subscription == nil {
+		subscription = make(map[string][]string)
 	}
 	s.notifier.alertsInChannel = subscription
 	if _, ok := s.notifier.alertsInChannel[channelID]; !ok {

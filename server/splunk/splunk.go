@@ -134,10 +134,10 @@ func (s *splunk) LoginUser(mattermostUserID string, server string, id string) er
 		}
 	}
 
-	// if authErr := s.authCheck(); authErr != nil {
-	// 	s.currentUser = store.SplunkUser{}
-	// 	return authErr
-	// }
+	if authErr := s.authCheck(); authErr != nil {
+		s.currentUser = store.SplunkUser{}
+		return authErr
+	}
 
 	if isNew {
 		return s.Store.RegisterUser(mattermostUserID, s.currentUser)

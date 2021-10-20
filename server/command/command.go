@@ -167,7 +167,7 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 		config: conf,
 		splunk: a,
 	}
-	log.Printf(args.UserId, "======================================")
+
 	err := a.SyncUser(args.UserId)
 	if err != nil {
 		log.Printf("Error occurred while syncing user stored in KVStore :%v\n", err)

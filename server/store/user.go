@@ -162,9 +162,11 @@ func (s *pluginStore) GetSubscription(key string) (map[string][]string, error) {
 	if appErr != nil {
 		return subscriptions, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
 	}
-	err := json.Unmarshal(subscriptionByte, &subscriptions)
-	if err != nil {
-		return subscriptions, errors.Wrap(err, "Error While Decoding The Subscriptions")
+	if subscriptionByte != nil {
+		err := json.Unmarshal(subscriptionByte, &subscriptions)
+		if err != nil {
+			return subscriptions, errors.Wrap(err, "Error While Decoding The Subscriptions")
+		}
 	}
 	return subscriptions, nil
 }
