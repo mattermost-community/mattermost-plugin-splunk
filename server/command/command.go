@@ -19,6 +19,8 @@ const (
 * /splunk help - print this help message
 * /splunk auth --login [server base url] [username/token] - log into the splunk server
 * /splunk alert --subscribe - subscribe to alerts
+* /splunk alert --list - List alerts
+* /splunk alert --delete [alertID] - remove an alerts
 * /splunk log --list - list names of logs on server
 * /splunk log [logname] - show specific log from server
 `
@@ -66,6 +68,8 @@ func GetSlashCommand() *model.Command {
 
 func addSubCommands(splunk *model.AutocompleteData) {
 	splunk.AddCommand(createAlertCommand())
+	splunk.AddCommand(deleteAlertCommand())
+	splunk.AddCommand(listAlertCommand())
 	splunk.AddCommand(createAuthCommand())
 	splunk.AddCommand(createHelpCommand())
 	splunk.AddCommand(createlogCommand())
@@ -73,15 +77,33 @@ func addSubCommands(splunk *model.AutocompleteData) {
 
 func createAlertCommand() *model.AutocompleteData {
 	alert := model.NewAutocompleteData(
-		"alert", "--subscribe", "subscribe to alert")
+		"alert", "--subscribe / --list / --delete [alertid]", "subscribe to alert")
 
-	flag := []model.AutocompleteListItem{
-		{HelpText: "Subscribe", Item: "--subscribe"},
-	}
-	alert.AddStaticListArgument("Subscribe to alert", true, flag)
+	alert.AddCommand(addAlertCommand())
+	alert.AddCommand(deleteAlertCommand())
+	alert.AddCommand(listAlertCommand())
+
 	return alert
 }
+func addAlertCommand() *model.AutocompleteData {
+	alert := model.NewAutocompleteData(
+		"--subscribe", "", "Subscribe an alert")
 
+	return alert
+}
+func listAlertCommand() *model.AutocompleteData {
+	alert := model.NewAutocompleteData(
+		"--list", "", "List all alert")
+
+	return alert
+}
+func deleteAlertCommand() *model.AutocompleteData {
+	alert := model.NewAutocompleteData(
+		"--delete", "", "Remove an alert")
+	alert.AddTextArgument("AlertId to remove", "[alertid]", "")
+
+	return alert
+}
 func createAuthCommand() *model.AutocompleteData {
 	auth := model.NewAutocompleteData(
 		"auth", "--login [server base url] [username/token]", "log into the splunk server")
