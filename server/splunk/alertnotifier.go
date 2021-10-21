@@ -70,7 +70,6 @@ func (s *splunk) delete(channelID string, alertID string) error {
 	if _, ok := s.notifier.receivers[alertID]; !ok {
 		return errors.New("key not found in notifier")
 	}
-
 	aa, ok := subscription[channelID]
 	if !ok {
 		return errors.New("key not found in subscription")
