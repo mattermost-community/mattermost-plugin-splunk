@@ -243,7 +243,7 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 	var message = "Successfully removed alert"
 	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
-		message = "Error while removing alert"
+		message = "Error while removing alert" + err.Error()
 	}
 
 	return &model.CommandResponse{

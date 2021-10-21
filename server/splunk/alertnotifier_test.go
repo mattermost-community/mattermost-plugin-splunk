@@ -3,9 +3,18 @@ package splunk
 import (
 	"sync"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 )
 
 func Test_alertNotifier_delete(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	m := mock.NewMockStore(ctrl)
+	m.EXPECT().GetSubscription(gomock.Any()).Return(nil, nil).AnyTimes()
+	m.EXPECT().SetSubscription(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	defer ctrl.Finish()
+
 	type fields struct {
 		receivers       map[string]AlertActionFunc
 		alertsInChannel map[string][]string
@@ -54,12 +63,11 @@ func Test_alertNotifier_delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &splunk{
-				notifier: &alertNotifier{
-					receivers:       tt.fields.receivers,
-					alertsInChannel: tt.fields.alertsInChannel,
-					lock:            tt.fields.lock,
-				},
+			s := newSplunk(nil, m)
+			s.notifier = &alertNotifier{
+				receivers:       tt.fields.receivers,
+				alertsInChannel: tt.fields.alertsInChannel,
+				lock:            tt.fields.lock,
 			}
 			for _, arg := range tt.args.data {
 				if err := s.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {

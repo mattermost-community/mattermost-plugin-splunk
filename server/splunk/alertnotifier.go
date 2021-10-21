@@ -61,22 +61,23 @@ func (s *splunk) list(channelID string) ([]string, error) {
 }
 
 func (s *splunk) delete(channelID string, alertID string) error {
+	s.notifier.lock.Lock()
 	defer s.notifier.lock.Unlock()
 	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
 	if err != nil {
 		return errors.Wrap(err, "error in getting subscription")
 	}
 	if _, ok := s.notifier.receivers[alertID]; !ok {
-		return errors.New("key not found")
+		return errors.New("key not found in notifier")
 	}
 
 	aa, ok := subscription[channelID]
 	if !ok {
-		return errors.New("key not found")
+		return errors.New("key not found in subscription")
 	}
 	ind := findInSlice(aa, alertID)
 	if ind == -1 {
-		return errors.New("key not found")
+		return errors.New("key not found in array")
 	}
 
 	delete(s.notifier.receivers, alertID)

@@ -77,6 +77,21 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1, arg2)
 }
 
+// GetSubscription mocks base method.
+func (m *MockStore) GetSubscription(arg0 string) (map[string][]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubscription", arg0)
+	ret0, _ := ret[0].(map[string][]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubscription indicates an expected call of GetSubscription.
+func (mr *MockStoreMockRecorder) GetSubscription(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscription", reflect.TypeOf((*MockStore)(nil).GetSubscription), arg0)
+}
+
 // RegisterUser mocks base method.
 func (m *MockStore) RegisterUser(arg0 string, arg1 store.SplunkUser) error {
 	m.ctrl.T.Helper()
@@ -89,6 +104,20 @@ func (m *MockStore) RegisterUser(arg0 string, arg1 store.SplunkUser) error {
 func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockStore)(nil).RegisterUser), arg0, arg1)
+}
+
+// SetSubscription mocks base method.
+func (m *MockStore) SetSubscription(arg0 string, arg1 map[string][]string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetSubscription", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetSubscription indicates an expected call of SetSubscription.
+func (mr *MockStoreMockRecorder) SetSubscription(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSubscription", reflect.TypeOf((*MockStore)(nil).SetSubscription), arg0, arg1)
 }
 
 // User mocks base method.
@@ -104,31 +133,4 @@ func (m *MockStore) User(arg0, arg1, arg2 string) (store.SplunkUser, error) {
 func (mr *MockStoreMockRecorder) User(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "User", reflect.TypeOf((*MockStore)(nil).User), arg0, arg1, arg2)
-}
-
-// ChangeCurrentUser mocks base method.
-func (m *MockStore) GetSubscription(key string) (map[string][]string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSubscription", key)
-	ret1, _ := ret[1].(error)
-	ret0, _ := ret[0].(map[string][]string)
-	return ret0, ret1
-}
-
-func (mr *MockStoreMockRecorder) GetSubscription(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscription", reflect.TypeOf((*MockStore)(nil).SetSubscription), arg0)
-}
-
-// ChangeCurrentUser mocks base method.
-func (m *MockStore) SetSubscription(key string, subscription map[string][]string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetSubscription", key, subscription)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-func (mr *MockStoreMockRecorder) SetSubscription(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSubscription", reflect.TypeOf((*MockStore)(nil).SetSubscription), arg0, arg1)
 }
