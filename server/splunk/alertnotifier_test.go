@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 )

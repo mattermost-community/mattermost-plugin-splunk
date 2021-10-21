@@ -49,7 +49,6 @@ func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) {
 			}
 		}(payload)
 	}
-
 }
 
 func (s *splunk) list(channelID string) ([]string, error) {

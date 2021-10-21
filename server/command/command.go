@@ -213,16 +213,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	if err != nil {
 		message = err.Error()
 	}
-	// , func(payload splunk.AlertActionWHPayload) {
-	// 	_, err := c.splunk.CreatePost(&model.Post{
-	// 		UserId:    c.splunk.BotUser(),
-	// 		ChannelId: c.args.ChannelId,
-	// 		Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
-	// 	})
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// }
+
 	return c.postCommandResponse(message), nil
 }
 
