@@ -10,6 +10,11 @@ import (
 // UserStoreKeyPrefix prefix for user data key is KVStore.
 const UserStoreKeyPrefix = "user_"
 
+type AlertNotifier struct {
+	Receivers       []string
+	AlertsInChannel map[string][]string
+}
+
 // UserStore API for user KVStore.
 type UserStore interface {
 	CurrentUser(mattermostUserID string) (SplunkUser, error)
@@ -18,8 +23,8 @@ type UserStore interface {
 	ChangeCurrentUser(mattermostUserID string, userName string) error
 	RegisterUser(mattermostUserID string, user SplunkUser) error
 	DeleteUser(mattermostUserID string, server string, userName string) error
-	GetSubscription(key string) (map[string][]string, error)
-	SetSubscription(key string, subscription map[string][]string) error
+	GetSubscription(key string) (AlertNotifier, error)
+	SetSubscription(key string, value AlertNotifier) error
 }
 
 // SplunkUser stores splunk user info.
@@ -156,25 +161,23 @@ func (s *pluginStore) storeUser(mattermostUserID string, u *user) error {
 	return nil
 }
 
-func (s *pluginStore) GetSubscription(key string) (map[string][]string, error) {
-	var subscriptions map[string][]string
+func (s *pluginStore) GetSubscription(key string) (AlertNotifier, error) {
+	var subscription AlertNotifier
 	subscriptionByte, appErr := s.userStore.Load(key)
 	if appErr != nil {
-		return subscriptions, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
+		return subscription, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
 	}
-	if subscriptionByte != nil {
-		err := json.Unmarshal(subscriptionByte, &subscriptions)
-		if err != nil {
-			return subscriptions, errors.Wrap(err, "Error While Decoding The Subscriptions")
-		}
+	appErr = json.Unmarshal(subscriptionByte, &subscription)
+	if appErr != nil {
+		return subscription, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
 	}
-	return subscriptions, nil
+	return subscription, nil
 }
 
-func (s *pluginStore) SetSubscription(key string, subscription map[string][]string) error {
-	value, err := json.Marshal(subscription)
+func (s *pluginStore) SetSubscription(key string, value AlertNotifier) error {
+	valueByte, err := json.Marshal(value)
 	if err != nil {
-		return errors.Wrap(err, "Error While Encoding The Subscriptions")
+		return err
 	}
-	return s.userStore.Store(key, value)
+	return s.userStore.Store(key, valueByte)
 }

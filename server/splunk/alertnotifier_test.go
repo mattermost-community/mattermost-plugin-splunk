@@ -1,24 +1,23 @@
 package splunk
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 )
 
 func Test_alertNotifier_delete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	m := mock.NewMockStore(ctrl)
-	m.EXPECT().GetSubscription(gomock.Any()).Return(nil, nil).AnyTimes()
+	m.EXPECT().GetSubscription(gomock.Any()).Return(store.AlertNotifier{}, nil).AnyTimes()
 	m.EXPECT().SetSubscription(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	defer ctrl.Finish()
 
+	s := newSplunk(nil, m)
 	type fields struct {
-		receivers       map[string]AlertActionFunc
-		alertsInChannel map[string][]string
-		lock            sync.Locker
+		alertsInChannel []string
 	}
 	type args struct {
 		data []struct {
@@ -35,39 +34,28 @@ func Test_alertNotifier_delete(t *testing.T) {
 		{
 			name: "gg",
 			fields: fields{
-				receivers: map[string]AlertActionFunc{
-					"1": func(payload AlertActionWHPayload) {},
-					"2": func(payload AlertActionWHPayload) {},
-					"3": func(payload AlertActionWHPayload) {},
-					"4": func(payload AlertActionWHPayload) {},
-					"5": func(payload AlertActionWHPayload) {},
-				},
-				alertsInChannel: map[string][]string{
-					"gg": {"1", "2", "3", "4", "5"},
-				},
-				lock: &sync.Mutex{},
+				alertsInChannel: []string{"1", "2", "3", "4", "5", "6"},
 			},
 			args: args{
 				data: []struct {
 					channelID string
 					alertID   string
 				}{
-					{alertID: "1", channelID: "gg"},
+					{alertID: "6", channelID: "gg"},
 					{alertID: "4", channelID: "gg"},
 					{alertID: "2", channelID: "gg"},
 				},
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newSplunk(nil, m)
-			s.notifier = &alertNotifier{
-				receivers:       tt.fields.receivers,
-				alertsInChannel: tt.fields.alertsInChannel,
-				lock:            tt.fields.lock,
+			for _, arg := range tt.fields.alertsInChannel {
+				if err := s.addAlertActionFunc("gg", arg); (err != nil) == tt.wantErr {
+					t.Errorf("addAlertActionFunc() error = %v, wantErr %v", err, tt.wantErr)
+				}
 			}
 			for _, arg := range tt.args.data {
 				if err := s.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {
