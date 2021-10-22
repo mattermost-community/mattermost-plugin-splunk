@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
-
 	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v5/plugin"
 	"github.com/pkg/errors"
 )
 
@@ -47,7 +47,7 @@ type PluginAPI interface {
 type splunk struct {
 	PluginAPI
 	store.Store
-
+	plugin.MattermostPlugin
 	botUserID string
 
 	currentUser store.SplunkUser

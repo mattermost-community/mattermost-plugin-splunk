@@ -11,7 +11,7 @@ import (
 const UserStoreKeyPrefix = "user_"
 
 type AlertNotifier struct {
-	Receivers       []string
+	Alerts          []string
 	AlertsInChannel map[string][]string
 }
 

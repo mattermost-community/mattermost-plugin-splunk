@@ -68,8 +68,6 @@ func GetSlashCommand() *model.Command {
 
 func addSubCommands(splunk *model.AutocompleteData) {
 	splunk.AddCommand(createAlertCommand())
-	splunk.AddCommand(deleteAlertCommand())
-	splunk.AddCommand(listAlertCommand())
 	splunk.AddCommand(createAuthCommand())
 	splunk.AddCommand(createHelpCommand())
 	splunk.AddCommand(createlogCommand())

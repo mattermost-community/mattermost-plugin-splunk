@@ -2,7 +2,6 @@ package splunk
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -20,7 +19,7 @@ func (s *splunk) addAlertActionFunc(channelID string, alertID string) error {
 	if subscription.AlertsInChannel == nil {
 		subscription.AlertsInChannel = make(map[string][]string)
 	}
-	subscription.Receivers = append(subscription.Receivers, alertID)
+	subscription.Alerts = append(subscription.Alerts, alertID)
 	if _, ok := subscription.AlertsInChannel[channelID]; !ok {
 		subscription.AlertsInChannel[channelID] = []string{}
 	}
@@ -35,9 +34,9 @@ func (s *splunk) addAlertActionFunc(channelID string, alertID string) error {
 func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) {
 	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
 	if err != nil {
-		log.Println(err)
+		s.API.LogError("Error while getting subscription", "error", err.Error())
 	}
-	if findInSlice(subscription.Receivers, alertID) != -1 {
+	if findInSlice(subscription.Alerts, alertID) != -1 {
 		func(payload AlertActionWHPayload) {
 			_, err := s.CreatePost(&model.Post{
 				UserId:    s.BotUser(),
@@ -45,7 +44,7 @@ func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) {
 				Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
 			})
 			if err != nil {
-				log.Println(err)
+				s.API.LogError("Error while creating post", "error", err.Error())
 			}
 		}(payload)
 	}
@@ -54,12 +53,12 @@ func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) {
 func (s *splunk) list(channelID string) ([]string, error) {
 	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "error in getting subscription")
+		return nil, errors.Wrap(err, "error in getting subscription")
 	}
 	if aa, ok := subscription.AlertsInChannel[channelID]; ok {
 		return aa, nil
 	}
-	return []string{}, nil
+	return nil, nil
 }
 
 func (s *splunk) delete(channelID string, alertID string) error {
@@ -67,11 +66,11 @@ func (s *splunk) delete(channelID string, alertID string) error {
 	if err != nil {
 		return errors.Wrap(err, "error in getting subscription")
 	}
-	foundAt := findInSlice(subscription.Receivers, alertID)
+	foundAt := findInSlice(subscription.Alerts, alertID)
 	if foundAt == -1 {
 		return errors.New("key not found in notifier")
 	}
-	subscription.Receivers = deleteFromSlice(subscription.Receivers, foundAt)
+	subscription.Alerts = deleteFromSlice(subscription.Alerts, foundAt)
 	aa, ok := subscription.AlertsInChannel[channelID]
 	if !ok {
 		return errors.New("key not found in subscription")
