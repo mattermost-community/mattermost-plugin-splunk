@@ -12,16 +12,19 @@ const (
 	SplunkSubscriptionsAlertList = "splunksublist"
 )
 
-func keyWithChannelID(key, ID string) string {
+func keyWithChannelID(key, id string) string {
 
-	return fmt.Sprintf("%s_%s", key, ID)
+	return fmt.Sprintf("%s_%s", key, id)
 }
 func (s *splunk) addAlertActionFunc(channelID string, alertID string) error {
-	subscription, err := s.Store.GetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID))
-	if err != nil {
-		return errors.Wrap(err, "error in getting subscription")
+	subscription, subErr := s.Store.GetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID))
+	if subErr != nil {
+		return errors.Wrap(subErr, "error in getting subscription")
 	}
 	subscriptionAlerts, err := s.Store.GetSubscription(SplunkSubscriptionsAlertList)
+	if err != nil {
+		return errors.Wrap(err, "error in getting alert list")
+	}
 	subscriptionAlerts = append(subscriptionAlerts, alertID)
 
 	subscription = append(subscription, alertID)
