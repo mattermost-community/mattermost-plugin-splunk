@@ -13,7 +13,6 @@ const (
 )
 
 func keyWithChannelID(key, id string) string {
-
 	return fmt.Sprintf("%s_%s", key, id)
 }
 func (s *splunk) addAlertActionFunc(channelID string, alertID string) error {
