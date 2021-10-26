@@ -5,14 +5,13 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 )
 
 func Test_alertNotifier_delete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	m := mock.NewMockStore(ctrl)
-	m.EXPECT().GetSubscription(gomock.Any()).Return(store.AlertNotifier{}, nil).AnyTimes()
+	m.EXPECT().GetSubscription(gomock.Any()).Return([]string{}, nil).AnyTimes()
 	m.EXPECT().SetSubscription(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	defer ctrl.Finish()
 

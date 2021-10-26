@@ -78,10 +78,10 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomoc
 }
 
 // GetSubscription mocks base method.
-func (m *MockStore) GetSubscription(arg0 string) (store.AlertNotifier, error) {
+func (m *MockStore) GetSubscription(arg0 string) ([]string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSubscription", arg0)
-	ret0, _ := ret[0].(store.AlertNotifier)
+	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -107,7 +107,7 @@ func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Ca
 }
 
 // SetSubscription mocks base method.
-func (m *MockStore) SetSubscription(arg0 string, arg1 store.AlertNotifier) error {
+func (m *MockStore) SetSubscription(arg0 string, arg1 []string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetSubscription", arg0, arg1)
 	ret0, _ := ret[0].(error)

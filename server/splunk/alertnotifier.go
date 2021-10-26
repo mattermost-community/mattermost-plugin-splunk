@@ -8,23 +8,28 @@ import (
 )
 
 const (
-	SplunkSubscriptionsKey = "splunksub"
+	SplunkSubscriptionsKey       = "splunksub"
+	SplunkSubscriptionsAlertList = "splunksublist"
 )
 
+func keyWithChannelID(key, ID string) string {
+
+	return fmt.Sprintf("%s_%s", key, ID)
+}
 func (s *splunk) addAlertActionFunc(channelID string, alertID string) error {
-	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
+	subscription, err := s.Store.GetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID))
 	if err != nil {
 		return errors.Wrap(err, "error in getting subscription")
 	}
-	if subscription.AlertsInChannel == nil {
-		subscription.AlertsInChannel = make(map[string][]string)
+	subscriptionAlerts, err := s.Store.GetSubscription(SplunkSubscriptionsAlertList)
+	subscriptionAlerts = append(subscriptionAlerts, alertID)
+
+	subscription = append(subscription, alertID)
+	err = s.Store.SetSubscription(SplunkSubscriptionsAlertList, subscriptionAlerts)
+	if err != nil {
+		return errors.Wrap(err, "error in storing alerts")
 	}
-	subscription.Alerts = append(subscription.Alerts, alertID)
-	if _, ok := subscription.AlertsInChannel[channelID]; !ok {
-		subscription.AlertsInChannel[channelID] = []string{}
-	}
-	subscription.AlertsInChannel[channelID] = append(subscription.AlertsInChannel[channelID], alertID)
-	err = s.Store.SetSubscription(SplunkSubscriptionsKey, subscription)
+	err = s.Store.SetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID), subscription)
 	if err != nil {
 		return errors.Wrap(err, "error in storing subscription")
 	}
@@ -32,11 +37,11 @@ func (s *splunk) addAlertActionFunc(channelID string, alertID string) error {
 }
 
 func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) {
-	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
+	subscriptionAlerts, err := s.Store.GetSubscription(SplunkSubscriptionsAlertList)
 	if err != nil {
 		s.API.LogError("Error while getting subscription", "error", err.Error())
 	}
-	if findInSlice(subscription.Alerts, alertID) != -1 {
+	if findInSlice(subscriptionAlerts, alertID) != -1 {
 		func(payload AlertActionWHPayload) {
 			_, err := s.CreatePost(&model.Post{
 				UserId:    s.BotUser(),
@@ -51,37 +56,38 @@ func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) {
 }
 
 func (s *splunk) list(channelID string) ([]string, error) {
-	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
+	subscription, err := s.Store.GetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID))
 	if err != nil {
-		return nil, errors.Wrap(err, "error in getting subscription")
+		return subscription, errors.Wrap(err, "error in getting subscription")
 	}
-	if aa, ok := subscription.AlertsInChannel[channelID]; ok {
-		return aa, nil
-	}
-	return nil, nil
+	return subscription, nil
 }
 
 func (s *splunk) delete(channelID string, alertID string) error {
-	subscription, err := s.Store.GetSubscription(SplunkSubscriptionsKey)
+	subscription, err := s.Store.GetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID))
 	if err != nil {
 		return errors.Wrap(err, "error in getting subscription")
 	}
-	foundAt := findInSlice(subscription.Alerts, alertID)
+	foundAt := findInSlice(subscription, alertID)
 	if foundAt == -1 {
 		return errors.New("key not found in notifier")
 	}
-	subscription.Alerts = deleteFromSlice(subscription.Alerts, foundAt)
-	aa, ok := subscription.AlertsInChannel[channelID]
-	if !ok {
-		return errors.New("key not found in subscription")
+	subscription = deleteFromSlice(subscription, foundAt)
+	subscriptionAlert, err := s.Store.GetSubscription(SplunkSubscriptionsAlertList)
+	if err != nil {
+		return errors.Wrap(err, "error in getting alert list")
 	}
-	ind := findInSlice(aa, alertID)
-	if ind == -1 {
-		return errors.New("key not found in array")
+	alertFoundAt := findInSlice(subscriptionAlert, alertID)
+	if alertFoundAt == -1 {
+		return errors.New("key not found in alert list")
 	}
 
-	subscription.AlertsInChannel[channelID] = deleteFromSlice(aa, ind)
-	err = s.Store.SetSubscription(SplunkSubscriptionsKey, subscription)
+	subscriptionAlert = deleteFromSlice(subscriptionAlert, alertFoundAt)
+	err = s.Store.SetSubscription(SplunkSubscriptionsAlertList, subscriptionAlert)
+	if err != nil {
+		return errors.Wrap(err, "error in storing alerts")
+	}
+	err = s.Store.SetSubscription(keyWithChannelID(SplunkSubscriptionsKey, channelID), subscription)
 	if err != nil {
 		return errors.Wrap(err, "error in updating subscription")
 	}

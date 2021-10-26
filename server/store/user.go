@@ -10,11 +10,6 @@ import (
 // UserStoreKeyPrefix prefix for user data key is KVStore.
 const UserStoreKeyPrefix = "user_"
 
-type AlertNotifier struct {
-	Alerts          []string
-	AlertsInChannel map[string][]string
-}
-
 // UserStore API for user KVStore.
 type UserStore interface {
 	CurrentUser(mattermostUserID string) (SplunkUser, error)
@@ -23,8 +18,8 @@ type UserStore interface {
 	ChangeCurrentUser(mattermostUserID string, userName string) error
 	RegisterUser(mattermostUserID string, user SplunkUser) error
 	DeleteUser(mattermostUserID string, server string, userName string) error
-	GetSubscription(key string) (AlertNotifier, error)
-	SetSubscription(key string, value AlertNotifier) error
+	GetSubscription(key string) ([]string, error)
+	SetSubscription(key string, value []string) error
 }
 
 // SplunkUser stores splunk user info.
@@ -161,20 +156,22 @@ func (s *pluginStore) storeUser(mattermostUserID string, u *user) error {
 	return nil
 }
 
-func (s *pluginStore) GetSubscription(key string) (AlertNotifier, error) {
-	var subscription AlertNotifier
+func (s *pluginStore) GetSubscription(key string) ([]string, error) {
+	var subscription []string
 	subscriptionByte, appErr := s.userStore.Load(key)
 	if appErr != nil {
 		return subscription, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
 	}
-	appErr = json.Unmarshal(subscriptionByte, &subscription)
-	if appErr != nil {
-		return subscription, errors.Wrap(appErr, "Error While Getting Subscription From KV Store")
+	if len(subscriptionByte) != 0 {
+		appErr = json.Unmarshal(subscriptionByte, &subscription)
+		if appErr != nil {
+			return subscription, errors.Wrap(appErr, "Error Unmarshal Subscription From KV Store ")
+		}
 	}
 	return subscription, nil
 }
 
-func (s *pluginStore) SetSubscription(key string, value AlertNotifier) error {
+func (s *pluginStore) SetSubscription(key string, value []string) error {
 	valueByte, err := json.Marshal(value)
 	if err != nil {
 		return err
