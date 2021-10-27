@@ -11,8 +11,10 @@ import (
 func Test_alertNotifier_delete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	m := mock.NewMockStore(ctrl)
-	m.EXPECT().GetSubscription(gomock.Any()).Return([]string{}, nil).AnyTimes()
-	m.EXPECT().SetSubscription(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	m.EXPECT().GetAllAlertIDs().Return([]string{}, nil).AnyTimes()
+	m.EXPECT().GetAlertsInChannel(gomock.Any()).Return([]string{}, nil).AnyTimes()
+	m.EXPECT().SetAllAlertIDs(gomock.Any()).Return(nil).AnyTimes()
+	m.EXPECT().SetAlertsInChannel(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	defer ctrl.Finish()
 
 	s := newSplunk(nil, m)

@@ -3,6 +3,7 @@ package store
 // Store encapsulates all store APIs
 type Store interface {
 	UserStore
+	SubscriptionStore
 }
 
 type pluginStore struct {

@@ -77,19 +77,34 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1, arg2)
 }
 
-// GetSubscription mocks base method.
-func (m *MockStore) GetSubscription(arg0 string) ([]string, error) {
+// GetAlertsInChannel mocks base method.
+func (m *MockStore) GetAlertsInChannel(arg0 string) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSubscription", arg0)
+	ret := m.ctrl.Call(m, "GetAlertsInChannel", arg0)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetSubscription indicates an expected call of GetSubscription.
-func (mr *MockStoreMockRecorder) GetSubscription(arg0 interface{}) *gomock.Call {
+// GetAlertsInChannel indicates an expected call of GetAlertsInChannel.
+func (mr *MockStoreMockRecorder) GetAlertsInChannel(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscription", reflect.TypeOf((*MockStore)(nil).GetSubscription), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlertsInChannel", reflect.TypeOf((*MockStore)(nil).GetAlertsInChannel), arg0)
+}
+
+// GetAllAlertIDs mocks base method.
+func (m *MockStore) GetAllAlertIDs() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllAlertIDs")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllAlertIDs indicates an expected call of GetAllAlertIDs.
+func (mr *MockStoreMockRecorder) GetAllAlertIDs() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllAlertIDs", reflect.TypeOf((*MockStore)(nil).GetAllAlertIDs))
 }
 
 // RegisterUser mocks base method.
@@ -106,18 +121,32 @@ func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockStore)(nil).RegisterUser), arg0, arg1)
 }
 
-// SetSubscription mocks base method.
-func (m *MockStore) SetSubscription(arg0 string, arg1 []string) error {
+// SetAlertsInChannel mocks base method.
+func (m *MockStore) SetAlertsInChannel(arg0 string, arg1 []string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetSubscription", arg0, arg1)
+	ret := m.ctrl.Call(m, "SetAlertsInChannel", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetSubscription indicates an expected call of SetSubscription.
-func (mr *MockStoreMockRecorder) SetSubscription(arg0, arg1 interface{}) *gomock.Call {
+// SetAlertsInChannel indicates an expected call of SetAlertsInChannel.
+func (mr *MockStoreMockRecorder) SetAlertsInChannel(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSubscription", reflect.TypeOf((*MockStore)(nil).SetSubscription), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAlertsInChannel", reflect.TypeOf((*MockStore)(nil).SetAlertsInChannel), arg0, arg1)
+}
+
+// SetAllAlertIDs mocks base method.
+func (m *MockStore) SetAllAlertIDs(arg0 []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetAllAlertIDs", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetAllAlertIDs indicates an expected call of SetAllAlertIDs.
+func (mr *MockStoreMockRecorder) SetAllAlertIDs(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAllAlertIDs", reflect.TypeOf((*MockStore)(nil).SetAllAlertIDs), arg0)
 }
 
 // User mocks base method.
