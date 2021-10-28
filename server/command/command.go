@@ -355,7 +355,7 @@ func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
 	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
 	if err != nil {
 		return &model.CommandResponse{
-			Text: "Wrong credentials. Try again appending error: " + err.Error(),
+			Text: "Wrong credentials",
 		}, nil
 	}
 

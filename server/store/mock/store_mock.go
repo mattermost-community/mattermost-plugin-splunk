@@ -63,6 +63,20 @@ func (mr *MockStoreMockRecorder) CurrentUser(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentUser", reflect.TypeOf((*MockStore)(nil).CurrentUser), arg0)
 }
 
+// DeleteAlertsInChannel mocks base method.
+func (m *MockStore) DeleteAlertsInChannel(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAlertsInChannel", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAlertsInChannel indicates an expected call of DeleteAlertsInChannel.
+func (mr *MockStoreMockRecorder) DeleteAlertsInChannel(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAlertsInChannel", reflect.TypeOf((*MockStore)(nil).DeleteAlertsInChannel), arg0, arg1)
+}
+
 // DeleteUser mocks base method.
 func (m *MockStore) DeleteUser(arg0, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
@@ -122,7 +136,7 @@ func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Ca
 }
 
 // SetAlertsInChannel mocks base method.
-func (m *MockStore) SetAlertsInChannel(arg0 string, arg1 []string) error {
+func (m *MockStore) SetAlertsInChannel(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetAlertsInChannel", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -136,7 +150,7 @@ func (mr *MockStoreMockRecorder) SetAlertsInChannel(arg0, arg1 interface{}) *gom
 }
 
 // SetAllAlertIDs mocks base method.
-func (m *MockStore) SetAllAlertIDs(arg0 []string) error {
+func (m *MockStore) SetAllAlertIDs(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetAllAlertIDs", arg0)
 	ret0, _ := ret[0].(error)

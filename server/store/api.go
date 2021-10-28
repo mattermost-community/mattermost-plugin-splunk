@@ -3,6 +3,7 @@ package store
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -75,4 +76,39 @@ func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
 		return errors.Wrap(err, "Error while storing json")
 	}
 	return s.Store(key, data.Bytes())
+}
+
+func LoadJSON(s KVStore, key string, v interface{}) error {
+	bytes, err := s.Load(key)
+	if err != nil {
+		return err
+	}
+	if len(bytes) > 0 {
+		err = json.Unmarshal(bytes, v)
+	}
+	return err
+}
+
+func SetJSON(s KVStore, key string, v interface{}) error {
+	bytes, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	return s.Store(key, bytes)
+}
+
+func FindInSlice(ss []string, key string) int {
+	for i, s := range ss {
+		if s == key {
+			return i
+		}
+	}
+	return -1
+}
+
+func DeleteFromSlice(ss []string, ind int) []string {
+	if ind < 0 || ind >= len(ss) {
+		return ss
+	}
+	return append(ss[0:ind], ss[ind+1:]...)
 }

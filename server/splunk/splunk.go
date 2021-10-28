@@ -8,7 +8,6 @@ import (
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 
 	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
 	"github.com/pkg/errors"
 )
 
@@ -22,7 +21,7 @@ type Splunk interface {
 	LogoutUser(mattermostUserID string) error
 
 	AddAlertListener(string, string) error
-	NotifyAll(string, AlertActionWHPayload)
+	NotifyAll(string, AlertActionWHPayload) error
 	ListAlert(string) ([]string, error)
 	DeleteAlert(string, string) error
 
@@ -40,15 +39,12 @@ type PluginAPI interface {
 
 	GetUsersInChannel(channelID, sortBy string, page, perPage int) ([]*model.User, error)
 	PublishWebSocketEvent(event string, payload map[string]interface{}, broadcast *model.WebsocketBroadcast)
-	// GetSubscription(key string) (map[string][]string, error)
-	// SetSubscription(key string, subscription map[string][]string) error
 	store.API
 }
 
 type splunk struct {
 	PluginAPI
 	store.Store
-	plugin.MattermostPlugin
 	botUserID string
 
 	currentUser store.SplunkUser

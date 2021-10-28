@@ -55,7 +55,7 @@ func Test_alertNotifier_delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for _, arg := range tt.fields.alertsInChannel {
-				if err := s.addAlertActionFunc("gg", arg); (err != nil) == tt.wantErr {
+				if err := s.addAler("gg", arg); (err != nil) == tt.wantErr {
 					t.Errorf("addAlertActionFunc() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
@@ -65,7 +65,7 @@ func Test_alertNotifier_delete(t *testing.T) {
 				}
 			}
 
-			t.Log(s.list("gg"))
+			t.Log(s.listAlertsInChannel("gg"))
 		})
 	}
 }
