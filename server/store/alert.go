@@ -8,8 +8,8 @@ import (
 
 // UserStoreKeyPrefix prefix for user data key is KVStore.
 const (
-	splunkSubscriptionsKey       = "splunksub"
-	splunkSubscriptionsAlertList = "splunksublist"
+	splunkSubscriptionsKey       = "splunkalert"
+	splunkSubscriptionsAlertList = "splunkalertlist"
 )
 
 // SubscriptionStore API for user KVStore.
@@ -27,7 +27,7 @@ func keyWithChannelID(key, id string) string {
 
 func (s *pluginStore) GetAllAlertIDs() ([]string, error) {
 	var alerts []string
-	return alerts, LoadJSON(s.alertStore, splunkSubscriptionsKey, &alerts)
+	return alerts, LoadJSON(s.alertStore, splunkSubscriptionsAlertList, &alerts)
 }
 
 func (s *pluginStore) GetAlertsInChannel(channelID string) ([]string, error) {
@@ -50,7 +50,6 @@ func (s *pluginStore) SetAllAlertIDs(alertID string) error {
 		return err
 	}
 	alerts = append(alerts, alertID)
-
 	return SetJSON(s.alertStore, splunkSubscriptionsAlertList, alerts)
 }
 

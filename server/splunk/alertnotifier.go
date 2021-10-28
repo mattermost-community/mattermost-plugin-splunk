@@ -3,6 +3,7 @@ package splunk
 import (
 	"fmt"
 
+	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
 )
@@ -24,7 +25,7 @@ func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) error {
 	if err != nil {
 		return errors.Wrap(err, "Error while getting subscription")
 	}
-	if findInSlice(subscriptionAlerts, alertID) != -1 {
+	if store.FindInSlice(subscriptionAlerts, alertID) != -1 {
 		_, err := s.CreatePost(&model.Post{
 			UserId:    s.BotUser(),
 			ChannelId: alertID,
