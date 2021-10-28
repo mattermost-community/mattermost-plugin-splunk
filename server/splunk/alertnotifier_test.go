@@ -15,6 +15,7 @@ func Test_alertNotifier_delete(t *testing.T) {
 	m.EXPECT().GetAlertsInChannel(gomock.Any()).Return([]string{}, nil).AnyTimes()
 	m.EXPECT().SetAllAlertIDs(gomock.Any()).Return(nil).AnyTimes()
 	m.EXPECT().SetAlertsInChannel(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	m.EXPECT().DeleteAlertsInChannel(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	defer ctrl.Finish()
 
 	s := newSplunk(nil, m)
@@ -60,7 +61,7 @@ func Test_alertNotifier_delete(t *testing.T) {
 				}
 			}
 			for _, arg := range tt.args.data {
-				if err := s.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {
+				if err := s.delete(arg.channelID, arg.alertID); (err != nil) == tt.wantErr {
 					t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
