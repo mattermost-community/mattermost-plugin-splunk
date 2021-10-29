@@ -3,18 +3,16 @@ package splunk
 import (
 	"fmt"
 
-	"github.com/mattermost/mattermost-plugin-splunk/server/store"
-
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
 )
 
-func (s *splunk) addAler(channelID string, alertID string) error {
-	err := s.Store.SetAllAlertIDs(alertID)
+func (s *splunk) addAlert(channelID string, alertID string) error {
+	err := s.Store.CreateAlert(alertID, channelID)
 	if err != nil {
-		return errors.Wrap(err, "error in storing alerts")
+		return errors.Wrap(err, "error storing a new alert")
 	}
-	err = s.Store.SetAlertsInChannel(channelID, alertID)
+	err = s.Store.SetAlertInChannel(channelID, alertID)
 	if err != nil {
 		return errors.Wrap(err, "error in storing subscription")
 	}
@@ -22,35 +20,36 @@ func (s *splunk) addAler(channelID string, alertID string) error {
 }
 
 func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) error {
-	subscriptionAlerts, err := s.Store.GetAllAlertIDs()
+	alerts, err := s.Store.GetAlertIDs()
 	if err != nil {
 		return errors.Wrap(err, "Error while getting subscription")
 	}
-	if store.FindInSlice(subscriptionAlerts, alertID) != -1 {
+	if channelID, ok := alerts[alertID]; ok {
 		_, err := s.CreatePost(&model.Post{
 			UserId:    s.BotUser(),
-			ChannelId: alertID,
+			ChannelId: channelID,
 			Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
 		})
 		if err != nil {
-			return errors.Wrap(err, "Error while creating post")
+			return errors.Wrap(err, "error creating post to notify channel for alert")
 		}
 	}
+
 	return nil
 }
 
 func (s *splunk) listAlertsInChannel(channelID string) ([]string, error) {
-	subscription, err := s.Store.GetAlertsInChannel(channelID)
+	alerts, err := s.Store.GetChannelAlertIDs(channelID)
 	if err != nil {
-		return subscription, errors.Wrap(err, "error in getting subscription")
+		return alerts, errors.Wrap(err, "error in listing alerts")
 	}
-	return subscription, nil
+	return alerts, nil
 }
 
 func (s *splunk) delete(channelID string, alertID string) error {
-	err := s.Store.DeleteAlertsInChannel(channelID, alertID)
+	err := s.Store.DeleteChannelAlert(channelID, alertID)
 	if err != nil {
-		return errors.Wrap(err, "error in getting subscription")
+		return errors.Wrap(err, "error in deleting alert")
 	}
 	return nil
 }

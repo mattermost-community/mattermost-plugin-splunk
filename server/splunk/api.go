@@ -41,7 +41,7 @@ type AlertActionFunc func(payload AlertActionWHPayload)
 
 // AddAlertListener registers new listener for alert action
 func (s *splunk) AddAlertListener(channelID string, alertID string) error {
-	return s.addAler(channelID, alertID)
+	return s.addAlert(channelID, alertID)
 }
 
 // NotifyAll notifies all listeners about new alert action

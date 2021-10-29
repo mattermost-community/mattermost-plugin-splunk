@@ -48,6 +48,20 @@ func (mr *MockStoreMockRecorder) ChangeCurrentUser(arg0, arg1 interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeCurrentUser", reflect.TypeOf((*MockStore)(nil).ChangeCurrentUser), arg0, arg1)
 }
 
+// CreateAlert mocks base method.
+func (m *MockStore) CreateAlert(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAlert", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateAlert indicates an expected call of CreateAlert.
+func (mr *MockStoreMockRecorder) CreateAlert(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAlert", reflect.TypeOf((*MockStore)(nil).CreateAlert), arg0, arg1)
+}
+
 // CurrentUser mocks base method.
 func (m *MockStore) CurrentUser(arg0 string) (store.SplunkUser, error) {
 	m.ctrl.T.Helper()
@@ -63,18 +77,18 @@ func (mr *MockStoreMockRecorder) CurrentUser(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentUser", reflect.TypeOf((*MockStore)(nil).CurrentUser), arg0)
 }
 
-// DeleteAlertsInChannel mocks base method.
-func (m *MockStore) DeleteAlertsInChannel(arg0, arg1 string) error {
+// DeleteChannelAlert mocks base method.
+func (m *MockStore) DeleteChannelAlert(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteAlertsInChannel", arg0, arg1)
+	ret := m.ctrl.Call(m, "DeleteChannelAlert", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteAlertsInChannel indicates an expected call of DeleteAlertsInChannel.
-func (mr *MockStoreMockRecorder) DeleteAlertsInChannel(arg0, arg1 interface{}) *gomock.Call {
+// DeleteChannelAlert indicates an expected call of DeleteChannelAlert.
+func (mr *MockStoreMockRecorder) DeleteChannelAlert(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAlertsInChannel", reflect.TypeOf((*MockStore)(nil).DeleteAlertsInChannel), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteChannelAlert", reflect.TypeOf((*MockStore)(nil).DeleteChannelAlert), arg0, arg1)
 }
 
 // DeleteUser mocks base method.
@@ -91,34 +105,34 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1, arg2)
 }
 
-// GetAlertsInChannel mocks base method.
-func (m *MockStore) GetAlertsInChannel(arg0 string) ([]string, error) {
+// GetAlertIDs mocks base method.
+func (m *MockStore) GetAlertIDs() (map[string]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAlertsInChannel", arg0)
+	ret := m.ctrl.Call(m, "GetAlertIDs")
+	ret0, _ := ret[0].(map[string]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAlertIDs indicates an expected call of GetAlertIDs.
+func (mr *MockStoreMockRecorder) GetAlertIDs() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlertIDs", reflect.TypeOf((*MockStore)(nil).GetAlertIDs))
+}
+
+// GetChannelAlertIDs mocks base method.
+func (m *MockStore) GetChannelAlertIDs(arg0 string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetChannelAlertIDs", arg0)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetAlertsInChannel indicates an expected call of GetAlertsInChannel.
-func (mr *MockStoreMockRecorder) GetAlertsInChannel(arg0 interface{}) *gomock.Call {
+// GetChannelAlertIDs indicates an expected call of GetChannelAlertIDs.
+func (mr *MockStoreMockRecorder) GetChannelAlertIDs(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlertsInChannel", reflect.TypeOf((*MockStore)(nil).GetAlertsInChannel), arg0)
-}
-
-// GetAllAlertIDs mocks base method.
-func (m *MockStore) GetAllAlertIDs() ([]string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllAlertIDs")
-	ret0, _ := ret[0].([]string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAllAlertIDs indicates an expected call of GetAllAlertIDs.
-func (mr *MockStoreMockRecorder) GetAllAlertIDs() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllAlertIDs", reflect.TypeOf((*MockStore)(nil).GetAllAlertIDs))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChannelAlertIDs", reflect.TypeOf((*MockStore)(nil).GetChannelAlertIDs), arg0)
 }
 
 // RegisterUser mocks base method.
@@ -135,32 +149,18 @@ func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockStore)(nil).RegisterUser), arg0, arg1)
 }
 
-// SetAlertsInChannel mocks base method.
-func (m *MockStore) SetAlertsInChannel(arg0, arg1 string) error {
+// SetAlertInChannel mocks base method.
+func (m *MockStore) SetAlertInChannel(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetAlertsInChannel", arg0, arg1)
+	ret := m.ctrl.Call(m, "SetAlertInChannel", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetAlertsInChannel indicates an expected call of SetAlertsInChannel.
-func (mr *MockStoreMockRecorder) SetAlertsInChannel(arg0, arg1 interface{}) *gomock.Call {
+// SetAlertInChannel indicates an expected call of SetAlertInChannel.
+func (mr *MockStoreMockRecorder) SetAlertInChannel(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAlertsInChannel", reflect.TypeOf((*MockStore)(nil).SetAlertsInChannel), arg0, arg1)
-}
-
-// SetAllAlertIDs mocks base method.
-func (m *MockStore) SetAllAlertIDs(arg0 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetAllAlertIDs", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetAllAlertIDs indicates an expected call of SetAllAlertIDs.
-func (mr *MockStoreMockRecorder) SetAllAlertIDs(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAllAlertIDs", reflect.TypeOf((*MockStore)(nil).SetAllAlertIDs), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAlertInChannel", reflect.TypeOf((*MockStore)(nil).SetAlertInChannel), arg0, arg1)
 }
 
 // User mocks base method.

@@ -78,7 +78,7 @@ func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
 	return s.Store(key, data.Bytes())
 }
 
-func LoadJSON(s KVStore, key string, v interface{}) error {
+func loadJSON(s KVStore, key string, v interface{}) error {
 	bytes, err := s.Load(key)
 	if err != nil {
 		return err
@@ -89,26 +89,10 @@ func LoadJSON(s KVStore, key string, v interface{}) error {
 	return err
 }
 
-func SetJSON(s KVStore, key string, v interface{}) error {
+func setJSON(s KVStore, key string, v interface{}) error {
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
 	return s.Store(key, bytes)
-}
-
-func FindInSlice(ss []string, key string) int {
-	for i, s := range ss {
-		if s == key {
-			return i
-		}
-	}
-	return -1
-}
-
-func DeleteFromSlice(ss []string, ind int) []string {
-	if ind < 0 || ind >= len(ss) {
-		return ss
-	}
-	return append(ss[0:ind], ss[ind+1:]...)
 }

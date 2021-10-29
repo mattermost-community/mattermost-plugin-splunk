@@ -19,8 +19,8 @@ const (
 * /splunk help - print this help message
 * /splunk auth --login [server base url] [username/token] - log into the splunk server
 * /splunk alert --subscribe - subscribe to alerts
-* /splunk alert --list - List alerts
-* /splunk alert --delete [alertID] - remove an alerts
+* /splunk alert --list - List all alerts
+* /splunk alert --delete [alertID] - Remove an alert
 * /splunk log --list - list names of logs on server
 * /splunk log [logname] - show specific log from server
 `

@@ -8,73 +8,85 @@ import (
 
 // UserStoreKeyPrefix prefix for user data key is KVStore.
 const (
-	splunkSubscriptionsKey       = "splunkalert"
-	splunkSubscriptionsAlertList = "splunkalertlist"
+	splunkAlertKey  = "splunkalert"
+	splunkAlertList = "splunkalertmap"
 )
 
-// SubscriptionStore API for user KVStore.
+// AlertStore API for alert KVStore.
 type AlertStore interface {
-	GetAllAlertIDs() ([]string, error)
-	GetAlertsInChannel(channelID string) ([]string, error)
-	SetAllAlertIDs(alertID string) error
-	SetAlertsInChannel(channelID string, alertsID string) error
-	DeleteAlertsInChannel(channelID string, alertsID string) error
+	GetAlertIDs() (map[string]string, error)
+	GetChannelAlertIDs(channelID string) ([]string, error)
+	CreateAlert(alertID, channelID string) error
+	SetAlertInChannel(channelID string, alertsID string) error
+	DeleteChannelAlert(channelID string, alertsID string) error
 }
 
 func keyWithChannelID(key, id string) string {
 	return fmt.Sprintf("%s_%s", key, id)
 }
 
-func (s *pluginStore) GetAllAlertIDs() ([]string, error) {
-	var alerts []string
-	return alerts, LoadJSON(s.alertStore, splunkSubscriptionsAlertList, &alerts)
+func (s *pluginStore) GetAlertIDs() (map[string]string, error) {
+	var alerts map[string]string
+	err := loadJSON(s.alertStore, splunkAlertList, &alerts)
+	return alerts, err
 }
 
-func (s *pluginStore) GetAlertsInChannel(channelID string) ([]string, error) {
+func (s *pluginStore) GetChannelAlertIDs(channelID string) ([]string, error) {
 	var subscription []string
-	return subscription, LoadJSON(s.alertStore, keyWithChannelID(splunkSubscriptionsKey, channelID), &subscription)
+	err := loadJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), &subscription)
+	return subscription, err
 }
 
-func (s *pluginStore) SetAlertsInChannel(channelID string, alertID string) error {
-	subscriptions, err := s.GetAlertsInChannel(channelID)
-	if err != nil {
-		return err
-	}
-	subscriptions = append(subscriptions, alertID)
-	return SetJSON(s.alertStore, keyWithChannelID(splunkSubscriptionsKey, channelID), subscriptions)
-}
-
-func (s *pluginStore) SetAllAlertIDs(alertID string) error {
-	alerts, err := s.GetAllAlertIDs()
+func (s *pluginStore) SetAlertInChannel(channelID string, alertID string) error {
+	alerts, err := s.GetChannelAlertIDs(channelID)
 	if err != nil {
 		return err
 	}
 	alerts = append(alerts, alertID)
-	return SetJSON(s.alertStore, splunkSubscriptionsAlertList, alerts)
+	err = setJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), alerts)
+	return err
 }
 
-func (s *pluginStore) DeleteAlertsInChannel(channelID string, alertID string) error {
-	subscriptions, err := s.GetAlertsInChannel(channelID)
+func (s *pluginStore) CreateAlert(alertID, channelID string) error {
+	alerts, err := s.GetAlertIDs()
 	if err != nil {
 		return err
 	}
-	alerts, err := s.GetAllAlertIDs()
+	if alerts == nil {
+		alerts = make(map[string]string)
+	}
+	alerts[alertID] = channelID
+	err = setJSON(s.alertStore, splunkAlertList, alerts)
+	return err
+}
+
+func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error {
+	subscriptions, err := s.GetChannelAlertIDs(channelID)
 	if err != nil {
 		return err
 	}
-	foundAt := FindInSlice(subscriptions, alertID)
-	if foundAt == -1 {
-		return errors.New("key not found in notifier")
-	}
-	subscriptions = DeleteFromSlice(subscriptions, foundAt)
-	alertFoundAt := FindInSlice(alerts, alertID)
-	if alertFoundAt == -1 {
-		return errors.New("key not found in alert list")
-	}
-	alerts = DeleteFromSlice(alerts, alertFoundAt)
-	err = SetJSON(s.alertStore, splunkSubscriptionsAlertList, alerts)
+	alerts, err := s.GetAlertIDs()
 	if err != nil {
 		return err
 	}
-	return SetJSON(s.alertStore, keyWithChannelID(splunkSubscriptionsKey, channelID), subscriptions)
+	subIndex := FindInSlice(subscriptions, alertID)
+	if subIndex == -1 {
+		return errors.New("alert to delete was not found in subscription")
+	}
+	subscriptions = DeleteFromSlice(subscriptions, subIndex)
+	if _, ok := alerts[alertID]; !ok {
+		return errors.New("alert to delete was not found in alert list")
+	}
+	delete(alerts, alertID)
+	err = setJSON(s.alertStore, splunkAlertList, alerts)
+	if err != nil {
+		return errors.Wrap(err, "error deleting alert: error storing alerts in KV store")
+	}
+
+	err = setJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), subscriptions)
+	if err != nil {
+		return errors.Wrap(err, "error deleting alert in subscription: error storing subscription in KV store")
+	}
+
+	return nil
 }
