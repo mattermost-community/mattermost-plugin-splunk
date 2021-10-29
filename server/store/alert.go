@@ -16,8 +16,7 @@ const (
 type AlertStore interface {
 	GetAlertIDs() (map[string]string, error)
 	GetChannelAlertIDs(channelID string) ([]string, error)
-	CreateAlert(alertID, channelID string) error
-	SetAlertInChannel(channelID string, alertsID string) error
+	CreateAlert(channelID string, alertsID string) error
 	DeleteChannelAlert(channelID string, alertsID string) error
 }
 
@@ -37,17 +36,11 @@ func (s *pluginStore) GetChannelAlertIDs(channelID string) ([]string, error) {
 	return subscription, err
 }
 
-func (s *pluginStore) SetAlertInChannel(channelID string, alertID string) error {
-	alerts, err := s.GetChannelAlertIDs(channelID)
+func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
+	channelAlerts, err := s.GetChannelAlertIDs(channelID)
 	if err != nil {
 		return err
 	}
-	alerts = append(alerts, alertID)
-	err = setJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), alerts)
-	return err
-}
-
-func (s *pluginStore) CreateAlert(alertID, channelID string) error {
 	alerts, err := s.GetAlertIDs()
 	if err != nil {
 		return err
@@ -57,7 +50,16 @@ func (s *pluginStore) CreateAlert(alertID, channelID string) error {
 	}
 	alerts[alertID] = channelID
 	err = setJSON(s.alertStore, splunkAlertList, alerts)
-	return err
+	if err != nil {
+		return err
+	}
+	channelAlerts = append(channelAlerts, alertID)
+	err = setJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), channelAlerts)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error {

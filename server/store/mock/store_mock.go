@@ -149,20 +149,6 @@ func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockStore)(nil).RegisterUser), arg0, arg1)
 }
 
-// SetAlertInChannel mocks base method.
-func (m *MockStore) SetAlertInChannel(arg0, arg1 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetAlertInChannel", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetAlertInChannel indicates an expected call of SetAlertInChannel.
-func (mr *MockStoreMockRecorder) SetAlertInChannel(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAlertInChannel", reflect.TypeOf((*MockStore)(nil).SetAlertInChannel), arg0, arg1)
-}
-
 // User mocks base method.
 func (m *MockStore) User(arg0, arg1, arg2 string) (store.SplunkUser, error) {
 	m.ctrl.T.Helper()
