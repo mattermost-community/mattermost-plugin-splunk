@@ -14,6 +14,10 @@ type API interface {
 	KVGet(key string) ([]byte, *model.AppError)
 	KVSet(key string, value []byte) *model.AppError
 	KVDelete(key string) *model.AppError
+	LogDebug(msg string, keyValuePairs ...interface{})
+	LogInfo(msg string, keyValuePairs ...interface{})
+	LogError(msg string, keyValuePairs ...interface{})
+	LogWarn(msg string, keyValuePairs ...interface{})
 }
 
 // KVStore abstraction for plugin.API.KVStore

@@ -52,17 +52,20 @@ func (h *handler) handleAlertActionWH() http.HandlerFunc {
 		var req splunk.AlertActionWHPayload
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
+			h.sp.LogError("Bad Request", "error", err)
 			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
 			return
 		}
 
 		id, err := getURLParam(r, "id")
 		if err != nil {
+			h.sp.LogError("Bad Request", "error", err)
 			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
 			return
 		}
 		err = h.sp.NotifyAll(id, req)
 		if err != nil {
+			h.sp.LogError("Error while notifyAll", "error", err)
 			h.jsonError(w, Error{Message: "Notify All", StatusCode: http.StatusInternalServerError})
 			return
 		}

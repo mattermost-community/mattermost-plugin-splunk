@@ -9,7 +9,6 @@ import (
 )
 
 func Test_alertNotifier_delete(t *testing.T) {
-
 	type fields struct {
 		alertsInChannel []string
 	}
