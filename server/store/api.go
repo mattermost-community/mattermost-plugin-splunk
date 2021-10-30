@@ -87,10 +87,10 @@ func loadJSON(s KVStore, key string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	if len(bytes) > 0 {
-		err = json.Unmarshal(bytes, v)
+	if bytes == nil {
+		return nil
 	}
-	return err
+	return json.Unmarshal(bytes, v)
 }
 
 func setJSON(s KVStore, key string, v interface{}) error {

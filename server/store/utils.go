@@ -1,6 +1,6 @@
 package store
 
-func FindInSlice(ss []string, key string) int {
+func findInSlice(ss []string, key string) int {
 	for i, s := range ss {
 		if s == key {
 			return i
@@ -9,7 +9,7 @@ func FindInSlice(ss []string, key string) int {
 	return -1
 }
 
-func DeleteFromSlice(ss []string, ind int) []string {
+func deleteFromSlice(ss []string, ind int) []string {
 	if ind < 0 || ind >= len(ss) {
 		return ss
 	}

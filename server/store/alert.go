@@ -71,11 +71,11 @@ func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error
 	if err != nil {
 		return err
 	}
-	subIndex := FindInSlice(subscriptions, alertID)
+	subIndex := findInSlice(subscriptions, alertID)
 	if subIndex == -1 {
 		return errors.New("alert to delete was not found in subscription")
 	}
-	subscriptions = DeleteFromSlice(subscriptions, subIndex)
+	subscriptions = deleteFromSlice(subscriptions, subIndex)
 	if _, ok := alerts[alertID]; !ok {
 		return errors.New("alert to delete was not found in alert list")
 	}

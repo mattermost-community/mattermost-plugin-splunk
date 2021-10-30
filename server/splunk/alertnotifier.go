@@ -18,7 +18,7 @@ func (s *splunk) addAlert(channelID string, alertID string) error {
 func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) error {
 	alerts, err := s.Store.GetAlertIDs()
 	if err != nil {
-		return errors.Wrap(err, "Error while getting subscription")
+		return errors.Wrap(err, "error while getting subscription")
 	}
 	if channelID, ok := alerts[alertID]; ok {
 		_, err := s.CreatePost(&model.Post{
