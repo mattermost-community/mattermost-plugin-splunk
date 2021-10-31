@@ -10,7 +10,7 @@ import (
 func (s *splunk) addAlert(channelID string, alertID string) error {
 	err := s.Store.CreateAlert(channelID, alertID)
 	if err != nil {
-		return errors.Wrap(err, "error in storing subscription")
+		return errors.Wrap(err, "error in storing alert")
 	}
 	return nil
 }
