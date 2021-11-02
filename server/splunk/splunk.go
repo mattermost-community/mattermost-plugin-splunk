@@ -21,7 +21,7 @@ type Splunk interface {
 	LogoutUser(mattermostUserID string) error
 
 	AddAlertListener(string, string) error
-	NotifyAll(string, AlertActionWHPayload) error
+	Notify(string, AlertActionWHPayload) error
 	ListAlert(string) ([]string, error)
 	DeleteAlert(string, string) error
 

@@ -15,12 +15,12 @@ func (s *splunk) addAlert(channelID string, alertID string) error {
 	return nil
 }
 
-func (s *splunk) notifyAll(alertID string, payload AlertActionWHPayload) error {
-	alerts, err := s.Store.GetAlertIDs()
+func (s *splunk) notify(alertID string, payload AlertActionWHPayload) error {
+	channelID, err := s.Store.GetAlertChannelID(alertID)
 	if err != nil {
 		return errors.Wrap(err, "error while getting subscription")
 	}
-	if channelID, ok := alerts[alertID]; ok {
+	if channelID != "" {
 		_, err := s.CreatePost(&model.Post{
 			UserId:    s.BotUser(),
 			ChannelId: channelID,

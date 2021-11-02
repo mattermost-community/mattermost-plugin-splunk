@@ -44,9 +44,9 @@ func (s *splunk) AddAlertListener(channelID string, alertID string) error {
 	return s.addAlert(channelID, alertID)
 }
 
-// NotifyAll notifies all listeners about new alert action
-func (s *splunk) NotifyAll(alertID string, payload AlertActionWHPayload) error {
-	return s.notifyAll(alertID, payload)
+// Notify notifies all listeners about new alert action
+func (s *splunk) Notify(alertID string, payload AlertActionWHPayload) error {
+	return s.notify(alertID, payload)
 }
 
 func (s *splunk) ListAlert(channelID string) ([]string, error) {

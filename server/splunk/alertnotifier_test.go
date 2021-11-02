@@ -44,7 +44,7 @@ func Test_alertNotifier_delete(t *testing.T) {
 	}
 	ctrl := gomock.NewController(t)
 	m := mock.NewMockStore(ctrl)
-	m.EXPECT().GetAlertIDs().Return(map[string]string{}, nil).AnyTimes()
+	m.EXPECT().GetAlertChannelID(gomock.Any()).Return("", nil).AnyTimes()
 	m.EXPECT().GetChannelAlertIDs(gomock.Any()).Return([]string{}, nil).AnyTimes()
 	m.EXPECT().CreateAlert(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	m.EXPECT().DeleteChannelAlert(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()

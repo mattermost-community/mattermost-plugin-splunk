@@ -63,9 +63,9 @@ func (h *handler) handleAlertActionWH() http.HandlerFunc {
 			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
 			return
 		}
-		err = h.sp.NotifyAll(id, req)
+		err = h.sp.Notify(id, req)
 		if err != nil {
-			h.sp.LogError("Error while notifyAll", "error", err)
+			h.sp.LogError("Error while notify", "error", err)
 			h.jsonError(w, Error{Message: "Notify All", StatusCode: http.StatusInternalServerError})
 			return
 		}
