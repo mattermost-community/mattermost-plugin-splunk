@@ -36,9 +36,9 @@ func (s *pluginStore) GetAlertChannelID(alertID string) (string, error) {
 }
 
 func (s *pluginStore) GetChannelAlertIDs(channelID string) ([]string, error) {
-	var subscription []string
-	err := loadJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), &subscription)
-	return subscription, err
+	var alerts []string
+	err := loadJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), &alerts)
+	return alerts, err
 }
 
 func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
