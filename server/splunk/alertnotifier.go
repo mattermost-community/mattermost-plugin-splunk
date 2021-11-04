@@ -20,15 +20,16 @@ func (s *splunk) notify(alertID string, payload AlertActionWHPayload) error {
 	if err != nil {
 		return errors.Wrap(err, "error while getting subscription")
 	}
-	if channelID != "" {
-		_, err := s.CreatePost(&model.Post{
-			UserId:    s.BotUser(),
-			ChannelId: channelID,
-			Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
-		})
-		if err != nil {
-			return errors.Wrap(err, "error creating post to notify channel for alert")
-		}
+	if channelID == "" {
+		return nil
+	}
+	_, err = s.CreatePost(&model.Post{
+		UserId:    s.BotUser(),
+		ChannelId: channelID,
+		Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
+	})
+	if err != nil {
+		return errors.Wrap(err, "error creating post to notify channel for alert")
 	}
 
 	return nil
