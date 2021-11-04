@@ -42,23 +42,23 @@ func Test_alertNotifier_delete(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	ctrl := gomock.NewController(t)
-	m := mock.NewMockStore(ctrl)
-	m.EXPECT().GetAlertChannelID(gomock.Any()).Return("", nil).AnyTimes()
-	m.EXPECT().GetChannelAlertIDs(gomock.Any()).Return([]string{}, nil).AnyTimes()
-	m.EXPECT().CreateAlert(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
-	m.EXPECT().DeleteChannelAlert(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
-	defer ctrl.Finish()
 
-	s := newSplunk(nil, m)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			m := mock.NewMockStore(ctrl)
+			defer ctrl.Finish()
+			s := newSplunk(nil, m)
 			for _, arg := range tt.fields.alertsInChannel {
+				m.EXPECT().CreateAlert("gg", arg).Return(nil).AnyTimes()
 				if err := s.addAlert("gg", arg); (err != nil) != tt.wantErr {
 					t.Errorf("addAlertActionFunc() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
 			for _, arg := range tt.args.data {
+				m.EXPECT().GetChannelAlertIDs(arg.channelID).Return(tt.fields.alertsInChannel, nil).AnyTimes()
+				m.EXPECT().GetAlertChannelID(arg.alertID).Return("", nil).AnyTimes()
+				m.EXPECT().DeleteChannelAlert(arg.channelID, arg.alertID).Return(nil).AnyTimes()
 				if err := s.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {
 					t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
 				}
