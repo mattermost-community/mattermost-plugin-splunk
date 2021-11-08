@@ -25,6 +25,8 @@ type KVStore interface {
 	Load(key string) ([]byte, error)
 	Store(key string, data []byte) error
 	Delete(key string) error
+	setJSON(s KVStore, key string, v interface{})
+	loadJSON(s KVStore, key string, v interface{})
 }
 
 type store struct {

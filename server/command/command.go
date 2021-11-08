@@ -75,7 +75,7 @@ func addSubCommands(splunk *model.AutocompleteData) {
 
 func createAlertCommand() *model.AutocompleteData {
 	alert := model.NewAutocompleteData(
-		"alert", "--subscribe / --list / --delete [alertid]", "subscribe to alert")
+		"alert", "[command]", "Available commands: subscribe, list, delete")
 
 	alert.AddCommand(addAlertCommand())
 	alert.AddCommand(deleteAlertCommand())

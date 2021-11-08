@@ -19,8 +19,8 @@ type AlertStore interface {
 	DeleteChannelAlert(channelID string, alertsID string) error
 }
 
-func keyWithChannelID(key, id string) string {
-	return fmt.Sprintf("%s_%s", key, id)
+func keyWithChannelID(channelID string) string {
+	return fmt.Sprintf("%s_%s", splunkAlertKey, channelID)
 }
 
 func (s *pluginStore) GetAlertChannelID(alertID string) (string, error) {
@@ -37,7 +37,7 @@ func (s *pluginStore) GetAlertChannelID(alertID string) (string, error) {
 
 func (s *pluginStore) GetChannelAlertIDs(channelID string) ([]string, error) {
 	var alerts []string
-	err := loadJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), &alerts)
+	err := loadJSON(s.alertStore, keyWithChannelID(channelID), &alerts)
 	return alerts, err
 }
 
@@ -57,7 +57,7 @@ func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
 		return err
 	}
 	channelAlerts = append(channelAlerts, alertID)
-	err = setJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), channelAlerts)
+	err = setJSON(s.alertStore, keyWithChannelID(channelID), channelAlerts)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error
 		return errors.Wrap(err, "error deleting alert: error storing alerts in KV store")
 	}
 
-	err = setJSON(s.alertStore, keyWithChannelID(splunkAlertKey, channelID), subscriptions)
+	err = setJSON(s.alertStore, keyWithChannelID(channelID), subscriptions)
 	if err != nil {
 		return errors.Wrap(err, "error deleting alert in subscription: error storing subscription in KV store")
 	}
