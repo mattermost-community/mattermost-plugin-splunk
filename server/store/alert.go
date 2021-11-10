@@ -25,7 +25,7 @@ func keyWithChannelID(channelID string) string {
 
 func (s *pluginStore) GetAlertChannelID(alertID string) (string, error) {
 	var alertsMap map[string]string
-	err := loadJSON(s.alertStore, splunkAlertMap, &alertsMap)
+	err := s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +37,7 @@ func (s *pluginStore) GetAlertChannelID(alertID string) (string, error) {
 
 func (s *pluginStore) GetChannelAlertIDs(channelID string) ([]string, error) {
 	var alerts []string
-	err := loadJSON(s.alertStore, keyWithChannelID(channelID), &alerts)
+	err := s.alertStore.loadJSON(keyWithChannelID(channelID), &alerts)
 	return alerts, err
 }
 
@@ -47,17 +47,17 @@ func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
 		return err
 	}
 	var alertsMap = make(map[string]string)
-	err = loadJSON(s.alertStore, splunkAlertMap, &alertsMap)
+	err = s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
 		return err
 	}
 	alertsMap[alertID] = channelID
-	err = setJSON(s.alertStore, splunkAlertMap, alertsMap)
+	err = s.alertStore.setJSON(splunkAlertMap, alertsMap)
 	if err != nil {
 		return err
 	}
 	channelAlerts = append(channelAlerts, alertID)
-	err = setJSON(s.alertStore, keyWithChannelID(channelID), channelAlerts)
+	err = s.alertStore.setJSON(keyWithChannelID(channelID), channelAlerts)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error
 		return err
 	}
 	var alertsMap = make(map[string]string)
-	err = loadJSON(s.alertStore, splunkAlertMap, &alertsMap)
+	err = s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
 		return err
 	}
@@ -84,12 +84,12 @@ func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error
 		return errors.New("alert to delete was not found in alert list")
 	}
 	delete(alertsMap, alertID)
-	err = setJSON(s.alertStore, splunkAlertMap, alertsMap)
+	err = s.alertStore.setJSON(splunkAlertMap, alertsMap)
 	if err != nil {
 		return errors.Wrap(err, "error deleting alert: error storing alerts in KV store")
 	}
 
-	err = setJSON(s.alertStore, keyWithChannelID(channelID), subscriptions)
+	err = s.alertStore.setJSON(keyWithChannelID(channelID), subscriptions)
 	if err != nil {
 		return errors.Wrap(err, "error deleting alert in subscription: error storing subscription in KV store")
 	}

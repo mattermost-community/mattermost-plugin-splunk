@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/store/mock"
 )
@@ -49,22 +50,19 @@ func Test_alertNotifier_delete(t *testing.T) {
 			m := mock.NewMockStore(ctrl)
 			defer ctrl.Finish()
 			s := newSplunk(nil, m)
-			for _, arg := range tt.fields.alertsInChannel {
-				m.EXPECT().CreateAlert("gg", arg).Return(nil).AnyTimes()
-				if err := s.addAlert("gg", arg); (err != nil) != tt.wantErr {
+			for _, alert := range tt.fields.alertsInChannel {
+				m.EXPECT().CreateAlert(tt.name, alert).Return(nil).Times(1)
+				if err := s.addAlert(tt.name, alert); (err != nil) != tt.wantErr {
 					t.Errorf("addAlertActionFunc() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
+
 			for _, arg := range tt.args.data {
-				m.EXPECT().GetChannelAlertIDs(arg.channelID).Return(tt.fields.alertsInChannel, nil).AnyTimes()
-				m.EXPECT().GetAlertChannelID(arg.alertID).Return("", nil).AnyTimes()
-				m.EXPECT().DeleteChannelAlert(arg.channelID, arg.alertID).Return(nil).AnyTimes()
-				if err := s.delete(arg.channelID, arg.alertID); (err != nil) != tt.wantErr {
+				m.EXPECT().DeleteChannelAlert(tt.name, arg.alertID).Return(errors.New("error in deleting alert")).Times(1)
+				if err := s.delete(tt.name, arg.alertID); (err != nil) == tt.wantErr {
 					t.Errorf("delete() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
-
-			t.Log(s.listAlertsInChannel("gg"))
 		})
 	}
 }
