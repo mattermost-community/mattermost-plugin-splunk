@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *splunk) addAlert(channelID string, alertID string) error {
+func (s *splunk) AddAlert(channelID string, alertID string) error {
 	err := s.Store.CreateAlert(channelID, alertID)
 	if err != nil {
 		return errors.Wrap(err, "error in storing alert")
@@ -15,7 +15,7 @@ func (s *splunk) addAlert(channelID string, alertID string) error {
 	return nil
 }
 
-func (s *splunk) notify(alertID string, payload AlertActionWHPayload) error {
+func (s *splunk) Notify(alertID string, payload AlertActionWHPayload) error {
 	channelID, err := s.Store.GetAlertChannelID(alertID)
 	if err != nil {
 		return errors.Wrap(err, "error while getting subscription")
@@ -35,7 +35,7 @@ func (s *splunk) notify(alertID string, payload AlertActionWHPayload) error {
 	return nil
 }
 
-func (s *splunk) listAlertsInChannel(channelID string) ([]string, error) {
+func (s *splunk) ListAlert(channelID string) ([]string, error) {
 	alerts, err := s.Store.GetChannelAlertIDs(channelID)
 	if err != nil {
 		return alerts, errors.Wrap(err, "error in listing alerts")
@@ -43,7 +43,7 @@ func (s *splunk) listAlertsInChannel(channelID string) ([]string, error) {
 	return alerts, nil
 }
 
-func (s *splunk) delete(channelID string, alertID string) error {
+func (s *splunk) DeleteAlert(channelID string, alertID string) error {
 	err := s.Store.DeleteChannelAlert(channelID, alertID)
 	if err != nil {
 		return errors.Wrap(err, "error in deleting alert")

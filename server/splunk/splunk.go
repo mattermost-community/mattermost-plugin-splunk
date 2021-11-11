@@ -20,7 +20,7 @@ type Splunk interface {
 	LoginUser(mattermostUserID string, server string, id string) error
 	LogoutUser(mattermostUserID string) error
 
-	AddAlertListener(string, string) error
+	AddAlert(string, string) error
 	Notify(string, AlertActionWHPayload) error
 	ListAlert(string) ([]string, error)
 	DeleteAlert(string, string) error

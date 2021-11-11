@@ -25,8 +25,6 @@ type KVStore interface {
 	Load(key string) ([]byte, error)
 	Store(key string, data []byte) error
 	Delete(key string) error
-	loadJSON(key string, v interface{}) error
-	setJSON(key string, v interface{}) error
 }
 
 type store struct {
@@ -84,7 +82,7 @@ func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
 	return s.Store(key, data.Bytes())
 }
 
-func (s *store) loadJSON(key string, v interface{}) error {
+func loadJSON(s KVStore, key string, v interface{}) (returnErr error) {
 	bytes, err := s.Load(key)
 	if err != nil {
 		return err
@@ -95,7 +93,7 @@ func (s *store) loadJSON(key string, v interface{}) error {
 	return json.Unmarshal(bytes, v)
 }
 
-func (s *store) setJSON(key string, v interface{}) error {
+func setJSON(s KVStore, key string, v interface{}) error {
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return err

@@ -229,7 +229,7 @@ func alertSubscriptionMessage(siteURL string) (string, string) {
 
 func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	message, id := alertSubscriptionMessage(c.args.SiteURL)
-	err := c.splunk.AddAlertListener(c.args.ChannelId, id)
+	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
 		message = err.Error()
 	}

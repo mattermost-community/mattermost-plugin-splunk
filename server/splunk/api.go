@@ -39,24 +39,6 @@ type AlertActionWHPayload struct {
 // all of them will be notified
 type AlertActionFunc func(payload AlertActionWHPayload)
 
-// AddAlertListener registers new listener for alert action
-func (s *splunk) AddAlertListener(channelID string, alertID string) error {
-	return s.addAlert(channelID, alertID)
-}
-
-// Notify notifies all listeners about new alert action
-func (s *splunk) Notify(alertID string, payload AlertActionWHPayload) error {
-	return s.notify(alertID, payload)
-}
-
-func (s *splunk) ListAlert(channelID string) ([]string, error) {
-	return s.listAlertsInChannel(channelID)
-}
-
-func (s *splunk) DeleteAlert(channelID string, alertID string) error {
-	return s.delete(channelID, alertID)
-}
-
 func (s *splunk) doHTTPRequest(method string, url string, body io.Reader) (*http.Response, error) {
 	user := s.User()
 	if user.Server == "" || user.Token == "" {
