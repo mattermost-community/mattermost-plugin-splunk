@@ -135,7 +135,7 @@ func (s *pluginStore) DeleteUser(mattermostUserID string, server string, userNam
 
 func (s *pluginStore) loadUser(mattermostUserID string) (*user, error) {
 	u := &user{}
-	err := LoadGOB(s.userStore, fmt.Sprintf("%s%s", UserStoreKeyPrefix, mattermostUserID), u)
+	err := s.userStore.loadGOB(fmt.Sprintf("%s%s", UserStoreKeyPrefix, mattermostUserID), u)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error while loading a user with id : %s", mattermostUserID)
 	}
@@ -146,7 +146,7 @@ func (s *pluginStore) storeUser(mattermostUserID string, u *user) error {
 	if u == nil {
 		return errors.New("user is nil")
 	}
-	err := SetGOB(s.userStore, fmt.Sprintf("%s%s", UserStoreKeyPrefix, mattermostUserID), u)
+	err := s.userStore.setGOB(fmt.Sprintf("%s%s", UserStoreKeyPrefix, mattermostUserID), u)
 	if err != nil {
 		return errors.Wrap(err, "error while storing user")
 	}

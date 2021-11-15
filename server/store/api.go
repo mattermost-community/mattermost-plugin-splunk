@@ -25,6 +25,10 @@ type KVStore interface {
 	Load(key string) ([]byte, error)
 	Store(key string, data []byte) error
 	Delete(key string) error
+	loadGOB(key string, v interface{}) error
+	setGOB(key string, v interface{}) error
+	setJSON(key string, v interface{}) error
+	loadJSON(key string, v interface{}) error
 }
 
 type store struct {
@@ -63,8 +67,8 @@ func (s *store) Delete(key string) error {
 	return nil
 }
 
-// LoadGOB load json data from KVStore
-func LoadGOB(s KVStore, key string, v interface{}) (returnErr error) {
+// loadGOB load json data from KVStore
+func (s *store) loadGOB(key string, v interface{}) (returnErr error) {
 	data, err := s.Load(key)
 	if err != nil {
 		return errors.Wrap(err, "Error while loading json")
@@ -72,8 +76,8 @@ func LoadGOB(s KVStore, key string, v interface{}) (returnErr error) {
 	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(v)
 }
 
-// SetGOB sets json data in KVStore
-func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
+// setGOB sets json data in KVStore
+func (s *store) setGOB(key string, v interface{}) (returnErr error) {
 	data := bytes.Buffer{}
 	err := gob.NewEncoder(&data).Encode(v)
 	if err != nil {
@@ -82,7 +86,7 @@ func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
 	return s.Store(key, data.Bytes())
 }
 
-func loadJSON(s KVStore, key string, v interface{}) (returnErr error) {
+func (s *store) loadJSON(key string, v interface{}) (returnErr error) {
 	bytes, err := s.Load(key)
 	if err != nil {
 		return err
@@ -93,7 +97,7 @@ func loadJSON(s KVStore, key string, v interface{}) (returnErr error) {
 	return json.Unmarshal(bytes, v)
 }
 
-func setJSON(s KVStore, key string, v interface{}) error {
+func (s *store) setJSON(key string, v interface{}) error {
 	bytes, err := json.Marshal(v)
 	if err != nil {
 		return err
