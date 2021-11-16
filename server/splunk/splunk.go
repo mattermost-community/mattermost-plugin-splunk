@@ -32,6 +32,9 @@ type Splunk interface {
 	ListLogs() []string
 }
 
+// check if the interface implements all methods
+var _Splunk = (*splunk)(nil)
+
 // PluginAPI API form mattermost plugin
 type PluginAPI interface {
 	SendEphemeralPost(userID string, post *model.Post) *model.Post
