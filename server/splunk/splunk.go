@@ -33,7 +33,7 @@ type Splunk interface {
 }
 
 // check if the interface implements all methods
-var _Splunk = (*splunk)(nil)
+var _ Splunk = (*splunk)(nil)
 
 // PluginAPI API form mattermost plugin
 type PluginAPI interface {
