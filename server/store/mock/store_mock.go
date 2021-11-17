@@ -104,21 +104,6 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1, arg2)
 }
 
-// GetAlertChannelID mocks base method
-func (m *MockStore) GetAlertChannelID(arg0 string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAlertChannelID", arg0)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAlertChannelID indicates an expected call of GetAlertChannelID
-func (mr *MockStoreMockRecorder) GetAlertChannelID(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlertChannelID", reflect.TypeOf((*MockStore)(nil).GetAlertChannelID), arg0)
-}
-
 // GetChannelAlertIDs mocks base method
 func (m *MockStore) GetChannelAlertIDs(arg0 string) ([]string, error) {
 	m.ctrl.T.Helper()
@@ -132,6 +117,21 @@ func (m *MockStore) GetChannelAlertIDs(arg0 string) ([]string, error) {
 func (mr *MockStoreMockRecorder) GetChannelAlertIDs(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChannelAlertIDs", reflect.TypeOf((*MockStore)(nil).GetChannelAlertIDs), arg0)
+}
+
+// GetChannelIDForAlert mocks base method
+func (m *MockStore) GetChannelIDForAlert(arg0 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetChannelIDForAlert", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetChannelIDForAlert indicates an expected call of GetChannelIDForAlert
+func (mr *MockStoreMockRecorder) GetChannelIDForAlert(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChannelIDForAlert", reflect.TypeOf((*MockStore)(nil).GetChannelIDForAlert), arg0)
 }
 
 // RegisterUser mocks base method

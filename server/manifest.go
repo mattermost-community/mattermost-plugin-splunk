@@ -31,7 +31,17 @@ const manifestStr = `
   "settings_schema": {
     "header": "",
     "footer": "",
-    "settings": []
+    "settings": [
+      {
+        "key": "Secret",
+        "display_name": "Webhook Secret:",
+        "type": "generated",
+        "help_text": "The secret used to authenticate the webhook to Mattermost.",
+        "regenerate_help_text": "Regenerates the secret for the webhook URL endpoint. Regenerating the secret invalidates your existing Splunk integrations.",
+        "placeholder": "",
+        "default": null
+      }
+    ]
   }
 }
 `

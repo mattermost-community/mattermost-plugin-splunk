@@ -17,11 +17,11 @@ const (
 	helpTextHeader = "###### Mattermost Splunk Plugin - Slash command help\n"
 	helpText       = `
 * /splunk help - print this help message
-* /splunk auth --login [server base url] [username/token] - log into the splunk server
-* /splunk alert --subscribe - subscribe to alerts
-* /splunk alert --list - List all alerts
-* /splunk alert --delete [alertID] - Remove an alert
-* /splunk log --list - list names of logs on server
+* /splunk auth login [server base url] [username/token] - log into the splunk server
+* /splunk alert subscribe - subscribe to alerts
+* /splunk alert list - List all alerts
+* /splunk alert delete [alertID] - Remove an alert
+* /splunk log list - list names of logs on server
 * /splunk log [logname] - show specific log from server
 `
 	autoCompleteDescription = ""
@@ -67,47 +67,37 @@ func GetSlashCommand() *model.Command {
 }
 
 func addSubCommands(splunk *model.AutocompleteData) {
-	splunk.AddCommand(createAlertCommand())
+	splunk.AddCommand(addSubscribeCommand())
 	splunk.AddCommand(createAuthCommand())
 	splunk.AddCommand(createHelpCommand())
 	splunk.AddCommand(createlogCommand())
 }
 
-func createAlertCommand() *model.AutocompleteData {
-	alert := model.NewAutocompleteData(
+func addSubscribeCommand() *model.AutocompleteData {
+	subscribe := model.NewAutocompleteData(
 		"alert", "[command]", "Available commands: subscribe, list, delete")
 
-	alert.AddCommand(addAlertCommand())
-	alert.AddCommand(deleteAlertCommand())
-	alert.AddCommand(listAlertCommand())
+	addAlert := model.NewAutocompleteData(
+		"subscribe", "", "Subscribe to an alert")
+	subscribe.AddCommand(addAlert)
+	deleteAlert := model.NewAutocompleteData(
+		"delete", "", "Remove an alert")
+	deleteAlert.AddTextArgument("AlertId to remove", "[alertid]", "")
 
-	return alert
-}
-func addAlertCommand() *model.AutocompleteData {
-	alert := model.NewAutocompleteData(
-		"--subscribe", "", "Subscribe an alert")
+	subscribe.AddCommand(deleteAlert)
+	listAlert := model.NewAutocompleteData(
+		"list", "", "List all alerts")
+	subscribe.AddCommand(listAlert)
 
-	return alert
+	return subscribe
 }
-func listAlertCommand() *model.AutocompleteData {
-	alert := model.NewAutocompleteData(
-		"--list", "", "List all alert")
 
-	return alert
-}
-func deleteAlertCommand() *model.AutocompleteData {
-	alert := model.NewAutocompleteData(
-		"--delete", "", "Remove an alert")
-	alert.AddTextArgument("AlertId to remove", "[alertid]", "")
-
-	return alert
-}
 func createAuthCommand() *model.AutocompleteData {
 	auth := model.NewAutocompleteData(
-		"auth", "--login [server base url] [username/token]", "log into the splunk server")
+		"auth", "login [server base url] [username/token]", "log into the splunk server")
 
 	flag := []model.AutocompleteListItem{
-		{HelpText: "Login to splunk server", Item: "--login"},
+		{HelpText: "Login to splunk server", Item: "login"},
 	}
 
 	auth.AddStaticListArgument("Login to splunk server [server base url] [username/token]", true, flag)
@@ -126,10 +116,10 @@ func createHelpCommand() *model.AutocompleteData {
 
 func createlogCommand() *model.AutocompleteData {
 	log := model.NewAutocompleteData(
-		"log", "[--list / logname]", "")
+		"log", "[list / logname]", "")
 
 	flag := []model.AutocompleteListItem{
-		{HelpText: "List all the log group", Item: "--list"},
+		{HelpText: "List all the log group", Item: "list"},
 	}
 
 	log.AddStaticListArgument("List all the log group", false, flag)
@@ -195,16 +185,16 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 
 	c.handler = HandlerMap{
 		handlers: map[string]HandlerFunc{
-			"alert/--subscribe": c.subscribeAlert,
-			"alert/--list":      c.listAlert,
-			"alert/--delete":    c.deleteAlert,
+			"alert/subscribe": c.subscribeAlert,
+			"alert/list":      c.listAlert,
+			"alert/delete":    c.deleteAlert,
 
-			"log":        c.getLogs,
-			"log/--list": c.getLogSourceList,
+			"log":      c.getLogs,
+			"log/list": c.getLogSourceList,
 
-			"auth/--user":   c.authUser,
-			"auth/--login":  c.authLogin,
-			"auth/--logout": c.authLogout,
+			"auth/user":   c.authUser,
+			"auth/login":  c.authLogin,
+			"auth/logout": c.authLogout,
 		},
 		defaultHandler: c.help,
 	}
@@ -213,22 +203,24 @@ func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *
 
 // alertSubscriptionMessage creates message for alert subscription
 // returns message text and unique id for alert
-func alertSubscriptionMessage(siteURL string) (string, string) {
+func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 	id := uuid.New()
 	post := fmt.Sprintf(
 		"Added alert\n"+
-			"You can copy following link to your splunk alert action: %s/plugins/%s%s%s?id=%s",
+			"You can copy following link to your splunk alert action: %s/plugins/%s%s%s?id=%s&secret=%s",
 		siteURL,
 		// TODO: Must replace with c.config.PluginID it returns empty string now
 		"com.mattermost.plugin-splunk",
 		config.APIPath,
 		api.WebhookEndpoint,
-		id)
+		id,
+		secret,
+	)
 	return post, id.String()
 }
 
 func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
-	message, id := alertSubscriptionMessage(c.args.SiteURL)
+	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
 	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
 		message = err.Error()
@@ -255,7 +247,7 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 	var message = "Successfully removed alert"
 	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
-		message = "Error while removing alert" + err.Error()
+		message = "Error while removing alert. " + err.Error()
 	}
 
 	return &model.CommandResponse{

@@ -19,6 +19,7 @@ import (
 type Config struct {
 	PluginID      string
 	PluginVersion string
+	Secret        string
 }
 
 // Clone shallow copies the Config. Your implementation may require a deep copy if

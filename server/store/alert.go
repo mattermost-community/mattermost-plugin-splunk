@@ -13,7 +13,7 @@ const (
 
 // AlertStore API for alert KVStore.
 type AlertStore interface {
-	GetAlertChannelID(alert string) (string, error)
+	GetChannelIDForAlert(alert string) (string, error)
 	GetChannelAlertIDs(channelID string) ([]string, error)
 	CreateAlert(channelID string, alertsID string) error
 	DeleteChannelAlert(channelID string, alertsID string) error
@@ -23,11 +23,11 @@ func keyWithChannelID(channelID string) string {
 	return fmt.Sprintf("%s_%s", splunkAlertKey, channelID)
 }
 
-func (s *pluginStore) GetAlertChannelID(alertID string) (string, error) {
+func (s *pluginStore) GetChannelIDForAlert(alertID string) (string, error) {
 	var alertsMap map[string]string
 	err := s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to load splunk alerts from store")
 	}
 	if channelID, ok := alertsMap[alertID]; ok {
 		return channelID, nil
@@ -44,22 +44,22 @@ func (s *pluginStore) GetChannelAlertIDs(channelID string) ([]string, error) {
 func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
 	channelAlerts, err := s.GetChannelAlertIDs(channelID)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to get alerts for channel %s", channelID)
 	}
 	var alertsMap = make(map[string]string)
 	err = s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to load splunk alerts from store")
 	}
 	alertsMap[alertID] = channelID
 	err = s.alertStore.setJSON(splunkAlertMap, alertsMap)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to save splunk alerts in store")
 	}
 	channelAlerts = append(channelAlerts, alertID)
 	err = s.alertStore.setJSON(keyWithChannelID(channelID), channelAlerts)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to save splunk alerts for channel %s", channelID)
 	}
 
 	return nil
@@ -68,12 +68,12 @@ func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
 func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error {
 	subscriptions, err := s.GetChannelAlertIDs(channelID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get alert IDs")
 	}
 	var alertsMap = make(map[string]string)
 	err = s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to load splunk alerts from store")
 	}
 	subIndex := findInSlice(subscriptions, alertID)
 	if subIndex == -1 {
