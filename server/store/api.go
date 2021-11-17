@@ -1,8 +1,6 @@
 package store
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -25,8 +23,6 @@ type KVStore interface {
 	Load(key string) ([]byte, error)
 	Store(key string, data []byte) error
 	Delete(key string) error
-	loadGOB(key string, v interface{}) error
-	setGOB(key string, v interface{}) error
 	setJSON(key string, v interface{}) error
 	loadJSON(key string, v interface{}) error
 }
@@ -65,25 +61,6 @@ func (s *store) Delete(key string) error {
 		return errors.Wrapf(appErr, "Error while deleting data from KVStore with key : %q", key)
 	}
 	return nil
-}
-
-// loadGOB load json data from KVStore
-func (s *store) loadGOB(key string, v interface{}) (returnErr error) {
-	data, err := s.Load(key)
-	if err != nil {
-		return errors.Wrap(err, "Error while loading json")
-	}
-	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(v)
-}
-
-// setGOB sets json data in KVStore
-func (s *store) setGOB(key string, v interface{}) (returnErr error) {
-	data := bytes.Buffer{}
-	err := gob.NewEncoder(&data).Encode(v)
-	if err != nil {
-		return errors.Wrap(err, "Error while storing json")
-	}
-	return s.Store(key, data.Bytes())
 }
 
 func (s *store) loadJSON(key string, v interface{}) (returnErr error) {
