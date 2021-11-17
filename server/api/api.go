@@ -35,14 +35,14 @@ type handler struct {
 
 type handlerWithUserID func(w http.ResponseWriter, r *http.Request, userID string)
 
-func newHandler(sp splunk.Splunk, Config *config.Config) *handler {
+func newHandler(sp splunk.Splunk, c *config.Config) *handler {
 	h := &handler{
 		Router: mux.NewRouter(),
 		sp:     sp,
 	}
 	apiRouter := h.Router.PathPrefix(config.APIPath).Subrouter()
 
-	apiRouter.HandleFunc(WebhookEndpoint, h.handleAlertActionWH(Config)).Methods(http.MethodPost)
+	apiRouter.HandleFunc(WebhookEndpoint, h.handleAlertActionWH(c)).Methods(http.MethodPost)
 
 	return h
 }
