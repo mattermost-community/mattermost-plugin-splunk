@@ -80,6 +80,7 @@ func addSubscribeCommand() *model.AutocompleteData {
 	addAlert := model.NewAutocompleteData(
 		"subscribe", "", "Subscribe to an alert")
 	subscribe.AddCommand(addAlert)
+
 	deleteAlert := model.NewAutocompleteData(
 		"delete", "", "Remove an alert")
 	deleteAlert.AddTextArgument("AlertId to remove", "[alertid]", "")
@@ -207,7 +208,7 @@ func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 	id := uuid.New()
 	post := fmt.Sprintf(
 		"Added alert\n"+
-			"You can copy following link to your splunk alert action: %s/plugins/%s%s%s?id=%s&secret=%s",
+			"You can copy the following link to your splunk alert action: %s/plugins/%s%s%s?id=%s&secret=%s",
 		siteURL,
 		// TODO: Must replace with c.config.PluginID it returns empty string now
 		"com.mattermost.plugin-splunk",
@@ -223,6 +224,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
 	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
+		c.splunk.LogError("error while subscribing alert", "error", err)
 		message = err.Error()
 	}
 
@@ -232,6 +234,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
 	list, err := c.splunk.ListAlert(c.args.ChannelId)
 	if err != nil {
+		c.splunk.LogError("error while list alert", "error", err)
 		return nil, err
 	}
 	return &model.CommandResponse{
@@ -247,6 +250,7 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 	var message = "Successfully removed alert"
 	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
+		c.splunk.LogError("error while delete alert", "error", err)
 		message = "Error while removing alert. " + err.Error()
 	}
 

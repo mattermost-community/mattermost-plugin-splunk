@@ -46,6 +46,7 @@ func (s *pluginStore) CreateAlert(channelID string, alertID string) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to get alerts for channel %s", channelID)
 	}
+
 	var alertsMap = make(map[string]string)
 	err = s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {

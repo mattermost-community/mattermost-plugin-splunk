@@ -62,6 +62,7 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 			h.sp.LogError(errMsg)
 			h.jsonError(w, Error{Message: errMsg, StatusCode: http.StatusBadRequest})
 		}
+		
 		secret := r.URL.Query().Get("secret")
 		if secret == "" {
 			errMsg := "Bad webhook request. Missing url param 'secret'"

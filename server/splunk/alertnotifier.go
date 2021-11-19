@@ -23,6 +23,7 @@ func (s *splunk) Notify(alertID string, payload AlertActionWHPayload) error {
 	if channelID == "" {
 		return nil
 	}
+	
 	_, err = s.CreatePost(&model.Post{
 		UserId:    s.BotUser(),
 		ChannelId: channelID,
