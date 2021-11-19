@@ -98,7 +98,7 @@ func createAuthCommand() *model.AutocompleteData {
 		"auth", "login [server base url] [username/token]", "log into the splunk server")
 
 	flag := []model.AutocompleteListItem{
-		{HelpText: "Login to splunk server", Item: "login"},
+		{HelpText: "Log into the splunk server", Item: "login"},
 	}
 
 	auth.AddStaticListArgument("Login to splunk server [server base url] [username/token]", true, flag)
