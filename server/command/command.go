@@ -233,7 +233,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
 	list, err := c.splunk.ListAlert(c.args.ChannelId)
 	if err != nil {
-		c.splunk.LogError("error while list alert", "error", err)
+		c.splunk.LogError("error while listing alerts", "error", err)
 		return nil, err
 	}
 	return &model.CommandResponse{
@@ -249,7 +249,7 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 	var message = "Successfully removed alert"
 	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
-		c.splunk.LogError("error while delete alert", "error", err)
+		c.splunk.LogError("error while deleting alert", "error", err)
 		message = "Error while removing alert. " + err.Error()
 	}
 
