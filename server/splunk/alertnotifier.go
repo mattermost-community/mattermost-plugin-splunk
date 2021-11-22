@@ -12,6 +12,7 @@ func (s *splunk) AddAlert(channelID string, alertID string) error {
 	if err != nil {
 		return errors.Wrap(err, "error in storing alert")
 	}
+
 	return nil
 }
 
@@ -20,9 +21,11 @@ func (s *splunk) Notify(alertID string, payload AlertActionWHPayload) error {
 	if err != nil {
 		return errors.Wrap(err, "error while getting subscription")
 	}
+
 	if channelID == "" {
 		return nil
 	}
+
 	_, err = s.CreatePost(&model.Post{
 		UserId:    s.BotUser(),
 		ChannelId: channelID,
@@ -40,6 +43,7 @@ func (s *splunk) ListAlert(channelID string) ([]string, error) {
 	if err != nil {
 		return alerts, errors.Wrap(err, "error in listing alerts")
 	}
+
 	return alerts, nil
 }
 
@@ -48,5 +52,6 @@ func (s *splunk) DeleteAlert(channelID string, alertID string) error {
 	if err != nil {
 		return errors.Wrap(err, "error in deleting alert")
 	}
+
 	return nil
 }
