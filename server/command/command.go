@@ -208,9 +208,8 @@ func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 	id := uuid.New()
 	post := fmt.Sprintf(
 		"Added alert\n"+
-			"You can copy the following link to your splunk alert action: %s/plugins/%s%s%s?id=%s&secret=%s",
+			"You can copy this [here](%s/plugins/%s%s%s?id=%s&secret=%s)",
 		siteURL,
-		// TODO: Must replace with c.config.PluginID it returns empty string now
 		"com.mattermost.plugin-splunk",
 		config.APIPath,
 		api.WebhookEndpoint,
