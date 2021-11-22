@@ -56,6 +56,7 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
 			return
 		}
+
 		id := r.URL.Query().Get("id")
 		if id == "" {
 			errMsg := "Bad webhook request. Missing url param 'id'"
@@ -70,12 +71,14 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 			h.jsonError(w, Error{Message: errMsg, StatusCode: http.StatusBadRequest})
 			return
 		}
+
 		if secret != config.Secret {
 			errMsg := "Bad webhook request. Invalid 'secret'"
 			h.sp.LogError(errMsg)
 			h.jsonError(w, Error{Message: errMsg, StatusCode: http.StatusBadRequest})
 			return
 		}
+
 		err = h.sp.Notify(id, req)
 		if err != nil {
 			errMsg := "Error during webhook notify process"
@@ -83,6 +86,7 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 			h.jsonError(w, Error{Message: errMsg, StatusCode: http.StatusInternalServerError})
 			return
 		}
+
 		h.respondWithSuccess(w)
 	}
 }
