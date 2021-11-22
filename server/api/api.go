@@ -76,7 +76,6 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 			h.jsonError(w, Error{Message: errMsg, StatusCode: http.StatusBadRequest})
 			return
 		}
-		
 		err = h.sp.Notify(id, req)
 		if err != nil {
 			errMsg := "Error during webhook notify process"
