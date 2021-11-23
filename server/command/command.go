@@ -79,7 +79,7 @@ func createAlertCommand() *model.AutocompleteData {
 
 	subscribe := model.NewAutocompleteData(
 		"subscribe", "", "Subscribe to an alert")
-		alert.AddCommand(subscribe)
+	alert.AddCommand(subscribe)
 
 	deleteAlert := model.NewAutocompleteData(
 		"delete", "", "Remove an alert")
