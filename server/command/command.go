@@ -88,7 +88,7 @@ func createAlertCommand() *model.AutocompleteData {
 	alert.AddCommand(deleteAlert)
 	listAlert := model.NewAutocompleteData(
 		"list", "", "List all alerts")
-		alert.AddCommand(listAlert)
+	alert.AddCommand(listAlert)
 
 	return alert
 }
