@@ -67,30 +67,30 @@ func GetSlashCommand() *model.Command {
 }
 
 func addSubCommands(splunk *model.AutocompleteData) {
-	splunk.AddCommand(addSubscribeCommand())
+	splunk.AddCommand(createAlertCommand())
 	splunk.AddCommand(createAuthCommand())
 	splunk.AddCommand(createHelpCommand())
 	splunk.AddCommand(createlogCommand())
 }
 
-func addSubscribeCommand() *model.AutocompleteData {
-	subscribe := model.NewAutocompleteData(
+func createAlertCommand() *model.AutocompleteData {
+	alert := model.NewAutocompleteData(
 		"alert", "[command]", "Available commands: subscribe, list, delete")
 
-	addAlert := model.NewAutocompleteData(
+	subscribe := model.NewAutocompleteData(
 		"subscribe", "", "Subscribe to an alert")
-	subscribe.AddCommand(addAlert)
+		alert.AddCommand(subscribe)
 
 	deleteAlert := model.NewAutocompleteData(
 		"delete", "", "Remove an alert")
 	deleteAlert.AddTextArgument("AlertId to remove", "[alertid]", "")
 
-	subscribe.AddCommand(deleteAlert)
+	alert.AddCommand(deleteAlert)
 	listAlert := model.NewAutocompleteData(
 		"list", "", "List all alerts")
-	subscribe.AddCommand(listAlert)
+		alert.AddCommand(listAlert)
 
-	return subscribe
+	return alert
 }
 
 func createAuthCommand() *model.AutocompleteData {
@@ -223,7 +223,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
 	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
-		c.splunk.LogError("error while subscribing alert", "error", err)
+		c.splunk.LogError("error while subscribing alert", "error", err.Error())
 		message = err.Error()
 	}
 
@@ -233,7 +233,7 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
 	list, err := c.splunk.ListAlert(c.args.ChannelId)
 	if err != nil {
-		c.splunk.LogError("error while listing alerts", "error", err)
+		c.splunk.LogError("error while listing alerts", "error", err.Error())
 		return nil, err
 	}
 	return &model.CommandResponse{
@@ -249,7 +249,7 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 	var message = "Successfully removed alert"
 	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
-		c.splunk.LogError("error while deleting alert", "error", err)
+		c.splunk.LogError("error while deleting alert", "error", err.Error())
 		message = "Error while removing alert. " + err.Error()
 	}
 

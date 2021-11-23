@@ -71,19 +71,23 @@ func (s *pluginStore) DeleteChannelAlert(channelID string, alertID string) error
 	if err != nil {
 		return errors.Wrap(err, "failed to get alert IDs")
 	}
+
 	var alertsMap = make(map[string]string)
 	err = s.alertStore.loadJSON(splunkAlertMap, &alertsMap)
 	if err != nil {
 		return errors.Wrap(err, "failed to load splunk alerts from store")
 	}
+
 	subIndex := findInSlice(subscriptions, alertID)
 	if subIndex == -1 {
 		return errors.New("alert to delete was not found in subscription")
 	}
+
 	subscriptions = deleteFromSlice(subscriptions, subIndex)
 	if _, ok := alertsMap[alertID]; !ok {
 		return errors.New("alert to delete was not found in alert list")
 	}
+
 	delete(alertsMap, alertID)
 	err = s.alertStore.setJSON(splunkAlertMap, alertsMap)
 	if err != nil {

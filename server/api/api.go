@@ -52,7 +52,7 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 		var req splunk.AlertActionWHPayload
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			h.sp.LogError("Bad Request", "error", err)
+			h.sp.LogError("Bad Request", "error", err.Error())
 			h.jsonError(w, Error{Message: "Bad Request", StatusCode: http.StatusBadRequest})
 			return
 		}
@@ -82,7 +82,7 @@ func (h *handler) handleAlertActionWH(config *config.Config) http.HandlerFunc {
 		err = h.sp.Notify(id, req)
 		if err != nil {
 			errMsg := "Error during webhook notify process"
-			h.sp.LogError(errMsg, "error", err)
+			h.sp.LogError(errMsg, "error", err.Error())
 			h.jsonError(w, Error{Message: errMsg, StatusCode: http.StatusInternalServerError})
 			return
 		}
