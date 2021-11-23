@@ -208,7 +208,7 @@ func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 	id := uuid.New()
 	post := fmt.Sprintf(
 		"Added alert\n"+
-			"You can copy this [link](%s/plugins/%s%s%s?id=%s&secret=%s) to your splunk alert action",
+			"Copy this [webhook url](%s/plugins/%s%s%s?id=%s&secret=%s) to your splunk alert action.",
 		siteURL,
 		"com.mattermost.plugin-splunk",
 		config.APIPath,
