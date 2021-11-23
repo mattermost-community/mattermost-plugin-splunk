@@ -47,3 +47,23 @@ func (p *plugin) KVSet(key string, value []byte) *model.AppError {
 func (p *plugin) KVDelete(key string) *model.AppError {
 	return p.API.KVDelete(key)
 }
+
+// LogWarn writes a log message to the Mattermost server log file.
+func (p *plugin) LogWarn(msg string, keyValuePairs ...interface{}) {
+	p.API.LogWarn(msg, keyValuePairs)
+}
+
+// LogError writes a log message to the Mattermost server log file.
+func (p *plugin) LogError(msg string, keyValuePairs ...interface{}) {
+	p.API.LogError(msg, keyValuePairs)
+}
+
+// LogInfo writes a log message to the Mattermost server log file.
+func (p *plugin) LogInfo(msg string, keyValuePairs ...interface{}) {
+	p.API.LogInfo(msg, keyValuePairs)
+}
+
+// LogDebug writes a log message to the Mattermost server log file.
+func (p *plugin) LogDebug(msg string, keyValuePairs ...interface{}) {
+	p.API.LogDebug(msg, keyValuePairs)
+}

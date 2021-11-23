@@ -1,62 +1,57 @@
 package splunk
 
 import (
-	"sync"
+	"fmt"
 
+	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
 )
 
-type alertNotifier struct {
-	receivers       map[string]AlertActionFunc
-	alertsInChannel map[string][]string
-	lock            sync.Locker
+func (s *splunk) AddAlert(channelID string, alertID string) error {
+	err := s.Store.CreateAlert(channelID, alertID)
+	if err != nil {
+		return errors.Wrap(err, "error in storing alert")
+	}
+
+	return nil
 }
 
-func (a *alertNotifier) addAlertActionFunc(channelID string, alertID string, f AlertActionFunc) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
-	a.receivers[alertID] = f
-	if _, ok := a.alertsInChannel[channelID]; !ok {
-		a.alertsInChannel[channelID] = []string{}
+func (s *splunk) Notify(alertID string, payload AlertActionWHPayload) error {
+	channelID, err := s.Store.GetChannelIDForAlert(alertID)
+	if err != nil {
+		return errors.Wrap(err, "error while getting subscription")
 	}
-	a.alertsInChannel[channelID] = append(a.alertsInChannel[channelID], alertID)
+
+	if channelID == "" {
+		return nil
+	}
+
+	_, err = s.CreatePost(&model.Post{
+		UserId:    s.BotUser(),
+		ChannelId: channelID,
+		Message:   fmt.Sprintf("New alert action received %s", payload.ResultsLink),
+	})
+	if err != nil {
+		return errors.Wrap(err, "error creating post to notify channel for alert")
+	}
+
+	return nil
 }
 
-func (a *alertNotifier) notifyAll(alertID string, payload AlertActionWHPayload) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
-	if f, ok := a.receivers[alertID]; ok {
-		f(payload)
+func (s *splunk) ListAlert(channelID string) ([]string, error) {
+	alerts, err := s.Store.GetChannelAlertIDs(channelID)
+	if err != nil {
+		return alerts, errors.Wrap(err, "error in listing alerts")
 	}
+
+	return alerts, nil
 }
 
-func (a *alertNotifier) list(channelID string) []string {
-	a.lock.Lock()
-	defer a.lock.Unlock()
-
-	if aa, ok := a.alertsInChannel[channelID]; ok {
-		return aa
-	}
-	return []string{}
-}
-
-func (a *alertNotifier) delete(channelID string, alertID string) error {
-	a.lock.Lock()
-	defer a.lock.Unlock()
-	if _, ok := a.receivers[alertID]; !ok {
-		return errors.New("key not found")
+func (s *splunk) DeleteAlert(channelID string, alertID string) error {
+	err := s.Store.DeleteChannelAlert(channelID, alertID)
+	if err != nil {
+		return errors.Wrap(err, "error in deleting alert")
 	}
 
-	aa, ok := a.alertsInChannel[channelID]
-	if !ok {
-		return errors.New("key not found")
-	}
-	ind := findInSlice(aa, alertID)
-	if ind == -1 {
-		return errors.New("key not found")
-	}
-
-	delete(a.receivers, alertID)
-	a.alertsInChannel[channelID] = deleteFromSlice(aa, ind)
 	return nil
 }

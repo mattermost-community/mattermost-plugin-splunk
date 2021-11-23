@@ -45,7 +45,7 @@ func NewWithStore(store store.Store, conf *config.Config) Plugin {
 	}
 
 	p.sp = splunk.New(p, store)
-	p.httpHandler = api.NewHTTPHandler(p.sp)
+	p.httpHandler = api.NewHTTPHandler(p.sp, conf)
 	return p
 }
 
@@ -57,7 +57,7 @@ func NewWithSplunk(sp splunk.Splunk, conf *config.Config) Plugin {
 		sp:                sp,
 	}
 
-	p.httpHandler = api.NewHTTPHandler(p.sp)
+	p.httpHandler = api.NewHTTPHandler(p.sp, conf)
 	return p
 }
 
@@ -68,7 +68,7 @@ func (p *plugin) OnActivate() error {
 	if p.sp == nil {
 		pluginStore := store.NewPluginStore(p)
 		p.sp = splunk.New(p, pluginStore)
-		p.httpHandler = api.NewHTTPHandler(p.sp)
+		p.httpHandler = api.NewHTTPHandler(p.sp, p.GetConfiguration())
 	}
 
 	err := p.API.RegisterCommand(command.GetSlashCommand())

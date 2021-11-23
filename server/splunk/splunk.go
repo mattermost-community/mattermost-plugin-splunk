@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"log"
 	"net/http"
-	"sync"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 
@@ -21,9 +20,9 @@ type Splunk interface {
 	LoginUser(mattermostUserID string, server string, id string) error
 	LogoutUser(mattermostUserID string) error
 
-	AddAlertListener(string, string, AlertActionFunc)
-	NotifyAll(string, AlertActionWHPayload)
-	ListAlert(string) []string
+	AddAlert(string, string) error
+	Notify(string, AlertActionWHPayload) error
+	ListAlert(string) ([]string, error)
 	DeleteAlert(string, string) error
 
 	AddBotUser(string)
@@ -32,6 +31,9 @@ type Splunk interface {
 	Logs(string) (LogResults, error)
 	ListLogs() []string
 }
+
+// check if the interface implements all methods
+var _ Splunk = (*splunk)(nil)
 
 // PluginAPI API form mattermost plugin
 type PluginAPI interface {
@@ -46,8 +48,6 @@ type PluginAPI interface {
 type splunk struct {
 	PluginAPI
 	store.Store
-
-	notifier  *alertNotifier
 	botUserID string
 
 	currentUser store.SplunkUser
@@ -154,13 +154,8 @@ func (s *splunk) LogoutUser(mattermostUserID string) error {
 
 func newSplunk(api PluginAPI, st store.Store) *splunk {
 	s := &splunk{
-		PluginAPI: api,
-		Store:     st,
-		notifier: &alertNotifier{
-			receivers:       make(map[string]AlertActionFunc),
-			alertsInChannel: make(map[string][]string),
-			lock:            &sync.Mutex{},
-		},
+		PluginAPI:  api,
+		Store:      st,
 		httpClient: http.DefaultClient,
 	}
 

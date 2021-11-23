@@ -16,7 +16,6 @@ func Test_splunk_ChangeUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	is := assert.New(t)
 	m := mock.NewMockStore(ctrl)
-
 	m.EXPECT().ChangeCurrentUser(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	m.EXPECT().RegisterUser(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	m.EXPECT().User(gomock.Any(), gomock.Any(), gomock.Any()).Return(store.SplunkUser{}, errors.New("no user found")).AnyTimes()

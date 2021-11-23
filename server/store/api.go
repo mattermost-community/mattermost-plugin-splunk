@@ -1,8 +1,7 @@
 package store
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -13,6 +12,10 @@ type API interface {
 	KVGet(key string) ([]byte, *model.AppError)
 	KVSet(key string, value []byte) *model.AppError
 	KVDelete(key string) *model.AppError
+	LogDebug(msg string, keyValuePairs ...interface{})
+	LogInfo(msg string, keyValuePairs ...interface{})
+	LogError(msg string, keyValuePairs ...interface{})
+	LogWarn(msg string, keyValuePairs ...interface{})
 }
 
 // KVStore abstraction for plugin.API.KVStore
@@ -20,6 +23,8 @@ type KVStore interface {
 	Load(key string) ([]byte, error)
 	Store(key string, data []byte) error
 	Delete(key string) error
+	setJSON(key string, v interface{}) error
+	loadJSON(key string, v interface{}) error
 }
 
 type store struct {
@@ -38,9 +43,7 @@ func (s *store) Load(key string) ([]byte, error) {
 	if appErr != nil {
 		return nil, errors.WithMessage(appErr, "failed plugin KVGet")
 	}
-	if data == nil {
-		return nil, errors.New("error while loading data from KVStore")
-	}
+
 	return data, nil
 }
 
@@ -60,21 +63,21 @@ func (s *store) Delete(key string) error {
 	return nil
 }
 
-// LoadGOB load json data from KVStore
-func LoadGOB(s KVStore, key string, v interface{}) (returnErr error) {
-	data, err := s.Load(key)
+func (s *store) loadJSON(key string, v interface{}) (returnErr error) {
+	bytes, err := s.Load(key)
 	if err != nil {
-		return errors.Wrap(err, "Error while loading json")
+		return err
 	}
-	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(v)
+	if bytes == nil {
+		return nil
+	}
+	return json.Unmarshal(bytes, v)
 }
 
-// SetGOB sets json data in KVStore
-func SetGOB(s KVStore, key string, v interface{}) (returnErr error) {
-	data := bytes.Buffer{}
-	err := gob.NewEncoder(&data).Encode(v)
+func (s *store) setJSON(key string, v interface{}) error {
+	bytes, err := json.Marshal(v)
 	if err != nil {
-		return errors.Wrap(err, "Error while storing json")
+		return err
 	}
-	return s.Store(key, data.Bytes())
+	return s.Store(key, bytes)
 }

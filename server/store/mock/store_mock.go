@@ -5,36 +5,35 @@
 package mock
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
 	store "github.com/mattermost/mattermost-plugin-splunk/server/store"
+	reflect "reflect"
 )
 
-// MockStore is a mock of Store interface.
+// MockStore is a mock of Store interface
 type MockStore struct {
 	ctrl     *gomock.Controller
 	recorder *MockStoreMockRecorder
 }
 
-// MockStoreMockRecorder is the mock recorder for MockStore.
+// MockStoreMockRecorder is the mock recorder for MockStore
 type MockStoreMockRecorder struct {
 	mock *MockStore
 }
 
-// NewMockStore creates a new mock instance.
+// NewMockStore creates a new mock instance
 func NewMockStore(ctrl *gomock.Controller) *MockStore {
 	mock := &MockStore{ctrl: ctrl}
 	mock.recorder = &MockStoreMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
-// ChangeCurrentUser mocks base method.
+// ChangeCurrentUser mocks base method
 func (m *MockStore) ChangeCurrentUser(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeCurrentUser", arg0, arg1)
@@ -42,13 +41,27 @@ func (m *MockStore) ChangeCurrentUser(arg0, arg1 string) error {
 	return ret0
 }
 
-// ChangeCurrentUser indicates an expected call of ChangeCurrentUser.
+// ChangeCurrentUser indicates an expected call of ChangeCurrentUser
 func (mr *MockStoreMockRecorder) ChangeCurrentUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeCurrentUser", reflect.TypeOf((*MockStore)(nil).ChangeCurrentUser), arg0, arg1)
 }
 
-// CurrentUser mocks base method.
+// CreateAlert mocks base method
+func (m *MockStore) CreateAlert(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAlert", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateAlert indicates an expected call of CreateAlert
+func (mr *MockStoreMockRecorder) CreateAlert(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAlert", reflect.TypeOf((*MockStore)(nil).CreateAlert), arg0, arg1)
+}
+
+// CurrentUser mocks base method
 func (m *MockStore) CurrentUser(arg0 string) (store.SplunkUser, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CurrentUser", arg0)
@@ -57,13 +70,27 @@ func (m *MockStore) CurrentUser(arg0 string) (store.SplunkUser, error) {
 	return ret0, ret1
 }
 
-// CurrentUser indicates an expected call of CurrentUser.
+// CurrentUser indicates an expected call of CurrentUser
 func (mr *MockStoreMockRecorder) CurrentUser(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentUser", reflect.TypeOf((*MockStore)(nil).CurrentUser), arg0)
 }
 
-// DeleteUser mocks base method.
+// DeleteChannelAlert mocks base method
+func (m *MockStore) DeleteChannelAlert(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteChannelAlert", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteChannelAlert indicates an expected call of DeleteChannelAlert
+func (mr *MockStoreMockRecorder) DeleteChannelAlert(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteChannelAlert", reflect.TypeOf((*MockStore)(nil).DeleteChannelAlert), arg0, arg1)
+}
+
+// DeleteUser mocks base method
 func (m *MockStore) DeleteUser(arg0, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", arg0, arg1, arg2)
@@ -71,13 +98,43 @@ func (m *MockStore) DeleteUser(arg0, arg1, arg2 string) error {
 	return ret0
 }
 
-// DeleteUser indicates an expected call of DeleteUser.
+// DeleteUser indicates an expected call of DeleteUser
 func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1, arg2)
 }
 
-// RegisterUser mocks base method.
+// GetChannelAlertIDs mocks base method
+func (m *MockStore) GetChannelAlertIDs(arg0 string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetChannelAlertIDs", arg0)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetChannelAlertIDs indicates an expected call of GetChannelAlertIDs
+func (mr *MockStoreMockRecorder) GetChannelAlertIDs(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChannelAlertIDs", reflect.TypeOf((*MockStore)(nil).GetChannelAlertIDs), arg0)
+}
+
+// GetChannelIDForAlert mocks base method
+func (m *MockStore) GetChannelIDForAlert(arg0 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetChannelIDForAlert", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetChannelIDForAlert indicates an expected call of GetChannelIDForAlert
+func (mr *MockStoreMockRecorder) GetChannelIDForAlert(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChannelIDForAlert", reflect.TypeOf((*MockStore)(nil).GetChannelIDForAlert), arg0)
+}
+
+// RegisterUser mocks base method
 func (m *MockStore) RegisterUser(arg0 string, arg1 store.SplunkUser) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterUser", arg0, arg1)
@@ -85,13 +142,13 @@ func (m *MockStore) RegisterUser(arg0 string, arg1 store.SplunkUser) error {
 	return ret0
 }
 
-// RegisterUser indicates an expected call of RegisterUser.
+// RegisterUser indicates an expected call of RegisterUser
 func (mr *MockStoreMockRecorder) RegisterUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockStore)(nil).RegisterUser), arg0, arg1)
 }
 
-// User mocks base method.
+// User mocks base method
 func (m *MockStore) User(arg0, arg1, arg2 string) (store.SplunkUser, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "User", arg0, arg1, arg2)
@@ -100,7 +157,7 @@ func (m *MockStore) User(arg0, arg1, arg2 string) (store.SplunkUser, error) {
 	return ret0, ret1
 }
 
-// User indicates an expected call of User.
+// User indicates an expected call of User
 func (mr *MockStoreMockRecorder) User(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "User", reflect.TypeOf((*MockStore)(nil).User), arg0, arg1, arg2)
