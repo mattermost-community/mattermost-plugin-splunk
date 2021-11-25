@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"fmt"
 	"github.com/mattermost/mattermost-server/v5/model"
 	mattermostPlugin "github.com/mattermost/mattermost-server/v5/plugin"
 	"math/rand"
