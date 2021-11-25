@@ -10,7 +10,7 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	mattermostPlugin "github.com/mattermost/mattermost-server/v5/plugin"
-	
+
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"
 	"github.com/mattermost/mattermost-plugin-splunk/server/command"
 	"github.com/mattermost/mattermost-plugin-splunk/server/config"
