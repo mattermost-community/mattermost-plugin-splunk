@@ -1,15 +1,15 @@
 package plugin
 
 import (
+	"fmt"
+	"github.com/mattermost/mattermost-server/v5/model"
+	mattermostPlugin "github.com/mattermost/mattermost-server/v5/plugin"
 	"math/rand"
 	"net/http"
 	"reflect"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/mattermost/mattermost-server/v5/model"
-	mattermostPlugin "github.com/mattermost/mattermost-server/v5/plugin"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"
 	"github.com/mattermost/mattermost-plugin-splunk/server/command"
@@ -97,9 +97,9 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp)
 	args := strings.Fields(commandArgs.Command)
 
-	commandResponse, err := commandHandler.Handle(args...)
+	commandResponse, err := commandHandler.Handle(commandArgs.UserId, args...)
 	if err == nil {
-		return p.sendEphemeralResponse(commandArgs, commandResponse.Text), nil
+		return commandResponse, nil
 	}
 
 	if appError, ok := err.(*model.AppError); ok {
@@ -112,6 +112,7 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 }
 
 func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
+	fmt.Println("************* ", text)
 	p.API.SendEphemeralPost(args.UserId, &model.Post{
 		UserId:    p.sp.BotUser(),
 		ChannelId: args.ChannelId,

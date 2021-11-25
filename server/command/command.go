@@ -32,11 +32,11 @@ const (
 
 // Handler returns API for interacting with plugin commands
 type Handler interface {
-	Handle(args ...string) (*model.CommandResponse, error)
+	Handle(userID string, args ...string) (*model.CommandResponse, error)
 }
 
 // HandlerFunc command handler function type
-type HandlerFunc func(args ...string) (*model.CommandResponse, error)
+type HandlerFunc func(userID string, args ...string) (*model.CommandResponse, error)
 
 // HandlerMap map of command handler functions
 type HandlerMap struct {
@@ -129,20 +129,20 @@ func createlogCommand() *model.AutocompleteData {
 	return log
 }
 
-func (c *command) Handle(args ...string) (*model.CommandResponse, error) {
+func (c *command) Handle(userID string, args ...string) (*model.CommandResponse, error) {
 	ch := c.handler
 	if len(args) == 0 || args[0] != "/"+slashCommandName {
-		return ch.defaultHandler(args...)
+		return ch.defaultHandler(userID, args...)
 	}
 	args = args[1:]
 
 	for n := len(args); n > 0; n-- {
 		h := ch.handlers[strings.Join(args[:n], "/")]
 		if h != nil {
-			return h(args[n:]...)
+			return h(userID, args[n:]...)
 		}
 	}
-	return ch.defaultHandler(args...)
+	return ch.defaultHandler(userID, args...)
 }
 
 // command stores command specific information
@@ -153,17 +153,23 @@ type command struct {
 	handler HandlerMap
 }
 
-func (c *command) help(_ ...string) (*model.CommandResponse, error) {
+func (c *command) help(userID string, _ ...string) (*model.CommandResponse, error) {
 	helpText := helpTextHeader + helpText
-	return c.postCommandResponse(helpText), nil
+	return c.postCommandResponse(userID, helpText), nil
 }
 
-func (c *command) postCommandResponse(text string) *model.CommandResponse {
-	return &model.CommandResponse{Text: text}
+func (c *command) postCommandResponse(userID, text string) *model.CommandResponse {
+	post := &model.Post{
+		UserId:    c.splunk.BotUser(),
+		ChannelId: c.args.ChannelId,
+		Message:   text,
+	}
+	c.splunk.SendEphemeralPost(userID, post)
+	return &model.CommandResponse{}
 }
 
 func (c *command) responsef(format string, args ...interface{}) *model.CommandResponse {
-	return c.postCommandResponse(fmt.Sprintf(format, args...))
+	return c.postCommandResponse("", fmt.Sprintf(format, args...))
 }
 
 func (c *command) responseRedirect(redirectURL string) *model.CommandResponse {
@@ -219,7 +225,7 @@ func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 	return post, id.String()
 }
 
-func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
+func (c *command) subscribeAlert(userID string, _ ...string) (*model.CommandResponse, error) {
 	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
 	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
@@ -227,23 +233,22 @@ func (c *command) subscribeAlert(_ ...string) (*model.CommandResponse, error) {
 		message = err.Error()
 	}
 
-	return c.postCommandResponse(message), nil
+	return c.postCommandResponse(userID, message), nil
 }
 
-func (c *command) listAlert(_ ...string) (*model.CommandResponse, error) {
+func (c *command) listAlert(userID string, _ ...string) (*model.CommandResponse, error) {
 	list, err := c.splunk.ListAlert(c.args.ChannelId)
 	if err != nil {
 		c.splunk.LogError("error while listing alerts", "error", err.Error())
 		return nil, err
 	}
-	return &model.CommandResponse{
-		Text: createMDForLogsList(list),
-	}, nil
+
+	return c.postCommandResponse(userID, createMDForLogsList(list)), nil
 }
 
-func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
+func (c *command) deleteAlert(userID string, args ...string) (*model.CommandResponse, error) {
 	if len(args) != 1 {
-		return &model.CommandResponse{Text: "Please enter correct number of arguments"}, nil
+		return c.postCommandResponse(userID, "Please enter correct number of arguments"), nil
 	}
 
 	var message = "Successfully removed alert"
@@ -253,30 +258,24 @@ func (c *command) deleteAlert(args ...string) (*model.CommandResponse, error) {
 		message = "Error while removing alert. " + err.Error()
 	}
 
-	return &model.CommandResponse{
-		Text: message,
-	}, nil
+	return c.postCommandResponse(userID, message), nil
 }
 
-func (c *command) getLogs(args ...string) (*model.CommandResponse, error) {
+func (c *command) getLogs(userID string, args ...string) (*model.CommandResponse, error) {
 	if len(args) != 1 {
-		return &model.CommandResponse{Text: "Please enter correct number of arguments"}, nil
+		return c.postCommandResponse(userID, "Please enter correct number of arguments"), nil
 	}
 
 	logResults, err := c.splunk.Logs(args[0])
 	if err != nil {
-		return &model.CommandResponse{Text: "Error while retrieving logs"}, nil
+		return c.postCommandResponse(userID, "Error while retrieving logs"), nil
 	}
 
-	return &model.CommandResponse{
-		Text: createMDForLogs(logResults),
-	}, nil
+	return c.postCommandResponse(userID, createMDForLogs(logResults)), nil
 }
 
-func (c *command) getLogSourceList(_ ...string) (*model.CommandResponse, error) {
-	return &model.CommandResponse{
-		Text: createMDForLogsList(c.splunk.ListLogs()),
-	}, nil
+func (c *command) getLogSourceList(userID string, _ ...string) (*model.CommandResponse, error) {
+	return c.postCommandResponse(userID, createMDForLogsList(c.splunk.ListLogs())), nil
 }
 
 func createMDForLogs(results splunk.LogResults) string {
@@ -327,39 +326,29 @@ func createMDForLogsList(results []string) string {
 	return res
 }
 
-func (c *command) authUser(_ ...string) (*model.CommandResponse, error) {
-	return &model.CommandResponse{
-		Text: fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName),
-	}, nil
+func (c *command) authUser(userID string, _ ...string) (*model.CommandResponse, error) {
+	return c.postCommandResponse(userID, fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName)), nil
 }
 
-func (c *command) authLogin(args ...string) (*model.CommandResponse, error) {
+func (c *command) authLogin(userID string, args ...string) (*model.CommandResponse, error) {
 	if len(args) < 2 {
-		return &model.CommandResponse{
-			Text: "Must have 2 arguments",
-		}, nil
+		return c.postCommandResponse(userID, "Must have 2 arguments"), nil
 	}
 
 	u, err := parseServerURL(args[0])
 	if err != nil {
-		return &model.CommandResponse{
-			Text: "Bad server URL",
-		}, nil
+		return c.postCommandResponse(userID, "Bad server URL"), nil
 	}
 
 	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
 	if err != nil {
-		return &model.CommandResponse{
-			Text: "Wrong credentials",
-		}, nil
+		return c.postCommandResponse(userID, "Wrong credentials"), nil
 	}
 
-	return &model.CommandResponse{Text: "Successfully authenticated"}, nil
+	return c.postCommandResponse(userID, "Successfully authenticated"), nil
 }
 
-func (c *command) authLogout(_ ...string) (*model.CommandResponse, error) {
+func (c *command) authLogout(userID string, _ ...string) (*model.CommandResponse, error) {
 	_ = c.splunk.LogoutUser(c.args.UserId)
-	return &model.CommandResponse{
-		Text: "Successful logout",
-	}, nil
+	return c.postCommandResponse(userID, "Successful logout"), nil
 }
