@@ -168,10 +168,6 @@ func (c *command) postCommandResponse(userID, text string) *model.CommandRespons
 	return &model.CommandResponse{}
 }
 
-func (c *command) responsef(format string, args ...interface{}) *model.CommandResponse {
-	return c.postCommandResponse("", fmt.Sprintf(format, args...))
-}
-
 func (c *command) responseRedirect(redirectURL string) *model.CommandResponse {
 	return &model.CommandResponse{
 		GotoLocation: redirectURL,
