@@ -112,7 +112,7 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 }
 
 func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
-	fmt.Println("************* ", text)
+
 	p.API.SendEphemeralPost(args.UserId, &model.Post{
 		UserId:    p.sp.BotUser(),
 		ChannelId: args.ChannelId,
