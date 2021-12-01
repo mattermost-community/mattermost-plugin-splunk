@@ -221,7 +221,7 @@ func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 	return post, id.String()
 }
 
-func (c *command) subscribeAlert( _ ...string) (string, error) {
+func (c *command) subscribeAlert(_ ...string) (string, error) {
 	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
 	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
