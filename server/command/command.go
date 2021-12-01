@@ -158,16 +158,6 @@ func (c *command) help(_ ...string) (string, error) {
 	return helpText, nil
 }
 
-func (c *command) postCommandResponse(text string) *model.CommandResponse {
-	post := &model.Post{
-		UserId:    c.splunk.BotUser(),
-		ChannelId: c.args.ChannelId,
-		Message:   text,
-	}
-	c.splunk.SendEphemeralPost(c.args.UserId, post)
-	return &model.CommandResponse{}
-}
-
 func (c *command) responseRedirect(redirectURL string) *model.CommandResponse {
 	return &model.CommandResponse{
 		GotoLocation: redirectURL,
