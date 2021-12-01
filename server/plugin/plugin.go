@@ -97,13 +97,13 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp)
 	args := strings.Fields(commandArgs.Command)
 
-	commandResponse, err := commandHandler.Handle(commandArgs.UserId, args...)
+	commandResponse, err := commandHandler.Handle(args...)
 	if err == nil {
-		return commandResponse, nil
+		return p.sendEphemeralResponse(commandArgs, commandResponse), nil
 	}
 
 	if appError, ok := err.(*model.AppError); ok {
-		return p.sendEphemeralResponse(commandArgs, commandResponse.Text), appError
+		return p.sendEphemeralResponse(commandArgs, commandResponse), appError
 	}
 
 	return p.sendEphemeralResponse(commandArgs, err.Error()), &model.AppError{
