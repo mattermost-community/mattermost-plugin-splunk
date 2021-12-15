@@ -9,8 +9,8 @@ func Test_parseServerURL(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{name: "default", u: "http://gobyexample.com:8080/url-parsing", want: "https://gobyexample.com:8080", wantErr: false},
-		{name: "no port", u: "http://gobyexample.com/url-parsing:8080", want: "https://gobyexample.com", wantErr: false},
+		{name: "default", u: "https://gobyexample.com:8080/url-parsing", want: "https://gobyexample.com:8080", wantErr: false},
+		{name: "no port", u: "http://gobyexample.com/url-parsing:8080", want: "http://gobyexample.com", wantErr: false},
 		{name: "bad url", u: "mail://gg.com/url-parsing:8080", want: "", wantErr: true},
 	}
 

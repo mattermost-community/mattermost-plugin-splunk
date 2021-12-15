@@ -1,0 +1,13 @@
+version: '3'
+services:
+    splunk:
+        build:
+            context: .
+        ports:
+            - "8000:8000"
+            - "8089:8089"
+        environment:
+            - SPLUNK_START_ARGS=--accept-license
+            - SPLUNK_PASSWORD=SplunkPass
+        volumes:
+            - ./scripts:/opt/splunk/bin/scripts

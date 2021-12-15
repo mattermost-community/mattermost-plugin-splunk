@@ -99,11 +99,11 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 
 	commandResponse, err := commandHandler.Handle(args...)
 	if err == nil {
-		return p.sendEphemeralResponse(commandArgs, commandResponse.Text), nil
+		return p.sendEphemeralResponse(commandArgs, commandResponse), nil
 	}
 
 	if appError, ok := err.(*model.AppError); ok {
-		return p.sendEphemeralResponse(commandArgs, commandResponse.Text), appError
+		return p.sendEphemeralResponse(commandArgs, commandResponse), appError
 	}
 
 	return p.sendEphemeralResponse(commandArgs, err.Error()), &model.AppError{
