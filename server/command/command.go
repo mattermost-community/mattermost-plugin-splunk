@@ -69,8 +69,8 @@ func GetSlashCommand() *model.Command {
 func addSubCommands(splunk *model.AutocompleteData) {
 	splunk.AddCommand(createAlertCommand())
 	splunk.AddCommand(createAuthCommand())
-	splunk.AddCommand(createHelpCommand())
 	splunk.AddCommand(createlogCommand())
+	splunk.AddCommand(createHelpCommand())
 }
 
 func createAlertCommand() *model.AutocompleteData {
@@ -108,13 +108,6 @@ func createAuthCommand() *model.AutocompleteData {
 	return auth
 }
 
-func createHelpCommand() *model.AutocompleteData {
-	help := model.NewAutocompleteData(
-		"help", "Display slash command help text", "")
-
-	return help
-}
-
 func createlogCommand() *model.AutocompleteData {
 	log := model.NewAutocompleteData(
 		"log", "[list / logname]", "")
@@ -127,6 +120,13 @@ func createlogCommand() *model.AutocompleteData {
 	log.AddTextArgument("[logname]", "Show specific log from server", "")
 
 	return log
+}
+
+func createHelpCommand() *model.AutocompleteData {
+	help := model.NewAutocompleteData(
+		"help", "", "Display slash command help text")
+
+	return help
 }
 
 func (c *command) Handle(args ...string) (string, error) {
