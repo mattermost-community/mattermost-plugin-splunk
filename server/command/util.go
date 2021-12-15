@@ -14,7 +14,6 @@ func parseServerURL(u string) (string, error) {
 	if ur.Scheme != "http" && ur.Scheme != "https" {
 		return "", errors.New("bad scheme")
 	}
-	ur.Scheme = "https"
 
 	return ur.Scheme + "://" + ur.Host, err
 }
