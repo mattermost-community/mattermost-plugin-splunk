@@ -15,6 +15,9 @@ const manifestStr = `
   "id": "com.mattermost.plugin-splunk",
   "name": "Splunk",
   "description": "Splunk plugin for mattermost",
+  "homepage_url": "https://github.com/mattermost/mattermost-plugin-splunk",
+  "support_url": "https://github.com/mattermost/mattermost-plugin-splunk/issues",
+  "release_notes_url": "https://github.com/mattermost/mattermost-plugin-splunk/releases/tag/v1.0.0",
   "version": "1.0.0",
   "min_server_version": "5.12.0",
   "server": {
