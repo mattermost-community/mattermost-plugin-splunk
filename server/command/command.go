@@ -10,7 +10,7 @@ import (
 	"github.com/mattermost/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/google/uuid"
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 )
 
 const (

@@ -8,8 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
-	mattermostPlugin "github.com/mattermost/mattermost-server/v5/plugin"
+	pluginapi "github.com/mattermost/mattermost-plugin-api"
+	"github.com/mattermost/mattermost-server/v6/model"
+	mattermostPlugin "github.com/mattermost/mattermost-server/v6/plugin"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"
 	"github.com/mattermost/mattermost-plugin-splunk/server/command"
@@ -76,11 +77,15 @@ func (p *plugin) OnActivate() error {
 		return errors.Wrap(err, "OnActivate: failed to register command")
 	}
 
-	botID, _ := p.Helpers.EnsureBot(&model.Bot{
+	client := pluginapi.NewClient(p.API, p.Driver)
+	botID, err := client.Bot.EnsureBot(&model.Bot{
 		Username:    "splunk",
 		DisplayName: "Splunk",
 		Description: "Created by the Splunk plugin.",
 	})
+	if err != nil {
+		return errors.Wrap(err, "failed to ensure splunk bot")
+	}
 	p.sp.AddBotUser(botID)
 
 	return nil
