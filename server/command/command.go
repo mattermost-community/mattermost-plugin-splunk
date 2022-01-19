@@ -53,7 +53,7 @@ func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) H
 
 // GetSlashCommand returns command to register
 func GetSlashCommand(api apicommand.PluginAPI) (*model.Command, error) {
-	iconData, err := apicommand.GetIconData(api, "assets/icon.svg")
+	iconData, err := apicommand.GetIconData(api, "assets/command.svg")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get icon data")
 	}
