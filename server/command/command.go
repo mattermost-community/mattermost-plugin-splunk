@@ -5,12 +5,14 @@ import (
 	"log"
 	"strings"
 
+	"github.com/google/uuid"
+	apicommand "github.com/mattermost/mattermost-plugin-api/experimental/command"
+	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/pkg/errors"
+
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"
 	"github.com/mattermost/mattermost-plugin-splunk/server/config"
 	"github.com/mattermost/mattermost-plugin-splunk/server/splunk"
-
-	"github.com/google/uuid"
-	"github.com/mattermost/mattermost-server/v5/model"
 )
 
 const (
@@ -50,20 +52,26 @@ func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) H
 }
 
 // GetSlashCommand returns command to register
-func GetSlashCommand() *model.Command {
+func GetSlashCommand(api apicommand.PluginAPI) (*model.Command, error) {
+	iconData, err := apicommand.GetIconData(api, "assets/command.svg")
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get icon data")
+	}
+
 	splunk := model.NewAutocompleteData(
 		slashCommandName, "[alert|auth|help|log]", "connect to and interact with splunk.")
 	addSubCommands(splunk)
 
 	return &model.Command{
-		Trigger:          slashCommandName,
-		DisplayName:      slashCommandName,
-		Description:      pluginDescription,
-		AutoComplete:     true,
-		AutocompleteData: splunk,
-		AutoCompleteDesc: autoCompleteDescription,
-		AutoCompleteHint: autoCompleteHint,
-	}
+		Trigger:              slashCommandName,
+		DisplayName:          slashCommandName,
+		Description:          pluginDescription,
+		AutoComplete:         true,
+		AutoCompleteDesc:     autoCompleteDescription,
+		AutoCompleteHint:     autoCompleteHint,
+		AutocompleteData:     splunk,
+		AutocompleteIconData: iconData,
+	}, nil
 }
 
 func addSubCommands(splunk *model.AutocompleteData) {
