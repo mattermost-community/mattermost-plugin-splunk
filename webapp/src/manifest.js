@@ -8,12 +8,13 @@ const manifest = JSON.parse(`
     "homepage_url": "https://github.com/mattermost/mattermost-plugin-splunk",
     "support_url": "https://github.com/mattermost/mattermost-plugin-splunk/issues",
     "release_notes_url": "https://github.com/mattermost/mattermost-plugin-splunk/releases/tag/v1.0.0",
+    "icon_path": "assets/icon.svg",
     "version": "1.0.0",
-    "min_server_version": "5.12.0",
+    "min_server_version": "5.37.0",
     "server": {
         "executables": {
-            "linux-amd64": "server/dist/plugin-linux-amd64",
             "darwin-amd64": "server/dist/plugin-darwin-amd64",
+            "linux-amd64": "server/dist/plugin-linux-amd64",
             "windows-amd64": "server/dist/plugin-windows-amd64.exe"
         },
         "executable": ""
