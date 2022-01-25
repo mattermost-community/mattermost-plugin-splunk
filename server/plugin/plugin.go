@@ -3,6 +3,7 @@ package plugin
 import (
 	"math/rand"
 	"net/http"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"sync"
@@ -72,7 +73,12 @@ func (p *plugin) OnActivate() error {
 		p.httpHandler = api.NewHTTPHandler(p.sp, p.GetConfiguration())
 	}
 
-	err := p.API.RegisterCommand(command.GetSlashCommand())
+	cmd, err := command.GetSlashCommand(p.API)
+	if err != nil {
+		return errors.Wrap(err, "failed to get command")
+	}
+
+	err = p.API.RegisterCommand(cmd)
 	if err != nil {
 		return errors.Wrap(err, "OnActivate: failed to register command")
 	}
@@ -82,7 +88,7 @@ func (p *plugin) OnActivate() error {
 		Username:    "splunk",
 		DisplayName: "Splunk",
 		Description: "Created by the Splunk plugin.",
-	})
+	}, pluginapi.ProfileImagePath(filepath.Join("assets", "profile.png")))
 	if err != nil {
 		return errors.Wrap(err, "failed to ensure splunk bot")
 	}

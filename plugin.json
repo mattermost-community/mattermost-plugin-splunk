@@ -3,6 +3,7 @@
     "name": "Splunk",
     "description": "Splunk plugin for mattermost",
     "version": "0.1.0",
+    "icon_path": "assets/icon.svg",
     "min_server_version": "5.37.0",
     "server": {
         "executables": {
