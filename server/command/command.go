@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	apicommand "github.com/mattermost/mattermost-plugin-api/experimental/command"
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 	"github.com/pkg/errors"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"

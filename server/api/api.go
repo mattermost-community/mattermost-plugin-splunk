@@ -8,7 +8,6 @@ import (
 	"github.com/mattermost/mattermost-plugin-splunk/server/splunk"
 
 	"github.com/gorilla/mux"
-	"github.com/mattermost/mattermost-server/v5/mlog"
 )
 
 const (
@@ -100,7 +99,7 @@ func (h *handler) respondWithJSON(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
-		mlog.Error(err.Error())
+		h.sp.LogWarn("Failed to send JSON response", "error", err.Error())
 	}
 }
 
