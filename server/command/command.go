@@ -237,7 +237,7 @@ func (c *command) listAlert(_ ...string) (string, error) {
 		return err.Error(), err
 	}
 
-	return createMDForLogsList(list), nil
+	return createMDForLogsList(list, "No alerts available"), nil
 }
 
 func (c *command) deleteAlert(args ...string) (string, error) {
@@ -269,7 +269,7 @@ func (c *command) getLogs(args ...string) (string, error) {
 }
 
 func (c *command) getLogSourceList(_ ...string) (string, error) {
-	return createMDForLogsList(c.splunk.ListLogs()), nil
+	return createMDForLogsList(c.splunk.ListLogs(), "No logs available"), nil
 }
 
 func createMDForLogs(results splunk.LogResults) string {
@@ -309,13 +309,13 @@ func createMDForLogs(results splunk.LogResults) string {
 	return res
 }
 
-func createMDForLogsList(results []string) string {
+func createMDForLogsList(results []string, fallback string) string {
 	res := ""
 	for _, s := range results {
 		res += "* " + s + "\n"
 	}
 	if res == "" {
-		return "No logs available"
+		return fallback
 	}
 	return res
 }
@@ -336,7 +336,7 @@ func (c *command) authLogin(args ...string) (string, error) {
 
 	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
 	if err != nil {
-		return "Wrong credentials", nil
+		return "Wrong credentials: " + err.Error(), nil
 	}
 
 	return "Successfully authenticated", nil
