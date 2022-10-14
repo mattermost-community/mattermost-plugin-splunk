@@ -166,12 +166,6 @@ func (c *command) help(_ ...string) (string, error) {
 	return helpText, nil
 }
 
-func (c *command) responseRedirect(redirectURL string) *model.CommandResponse {
-	return &model.CommandResponse{
-		GotoLocation: redirectURL,
-	}
-}
-
 func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *command {
 	c := &command{
 		args:   args,
