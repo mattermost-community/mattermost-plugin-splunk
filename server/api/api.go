@@ -32,8 +32,6 @@ type handler struct {
 	sp splunk.Splunk
 }
 
-type handlerWithUserID func(w http.ResponseWriter, r *http.Request, userID string)
-
 func newHandler(sp splunk.Splunk, c *config.Config) *handler {
 	h := &handler{
 		Router: mux.NewRouter(),
@@ -107,15 +105,4 @@ func (h *handler) respondWithSuccess(w http.ResponseWriter) {
 	h.respondWithJSON(w, struct {
 		Status string `json:"status"`
 	}{Status: "OK"})
-}
-
-func (h *handler) extractUserIDMiddleware(handler handlerWithUserID) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		mattermostUserID := r.Header.Get("Mattermost-User-ID")
-		if mattermostUserID == "" {
-			h.jsonError(w, Error{Message: "Not Authorized", StatusCode: http.StatusUnauthorized})
-			return
-		}
-		handler(w, r, mattermostUserID)
-	}
 }
