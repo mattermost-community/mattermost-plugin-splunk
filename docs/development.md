@@ -21,7 +21,7 @@ The files at [dev/splunk_scripts](https://github.com/mattermost/mattermost-plugi
 
 ### Building And Deployment
 
-To build your plugin use `make`
+To build your plugin use `make`, you can use `MM_DEBUG=1` as an envvar to generate a debug version of the plugin.
 
 Use `make check-style` to check the style.
 
