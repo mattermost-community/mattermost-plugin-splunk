@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 
@@ -126,9 +127,10 @@ func (s *splunk) LoginUser(mattermostUserID string, server string, id string) er
 		s.currentUser = u
 		isNew = false
 	} else {
+		loginData := strings.Split(id, "/")
 		s.currentUser = store.SplunkUser{
 			Server: server,
-			Token:  id,
+			Token:  loginData[1],
 		}
 	}
 
