@@ -123,17 +123,9 @@ endif
 .PHONY: dist
 dist:	apply server webapp bundle
 
-.PHONY: debug-dist
-debug-dist: apply server bundle
-	cd webapp && $(NPM) run debug
-
 ## Builds and installs the plugin to a server.
 .PHONY: deploy
 deploy: dist
-	./build/bin/pluginctl deploy $(PLUGIN_ID) dist/$(BUNDLE_NAME)
-
-.PHONY: debug-deploy
-debug-deploy: debug-dist
 	./build/bin/pluginctl deploy $(PLUGIN_ID) dist/$(BUNDLE_NAME)
 
 ## Builds and installs the plugin to a server, updating the webapp automatically when changed.

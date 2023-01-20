@@ -21,11 +21,9 @@ The files at [dev/splunk_scripts](https://github.com/mattermost/mattermost-plugi
 
 ### Building And Deployment
 
-To build your plugin use `make`, you can use `MM_DEBUG=1` as an envvar to generate a debug version of the plugin.
+To build your plugin use `make`, you can use `MM_DEBUG=1` as an envvar to generate a debug version of the plugin, including an unminified version of the Javascript webapp.
 
-Use `make check-style` to check the style.
-
-Use `make debug-dist` and `make debug-deploy` in place of `make dist` and `make deploy` to configure webpack to generate unminified Javascript.
+Use `make check-style` to check the style, use `make dist` and `make deploy` to build and deploy the application.
 
 `make` will produce a single plugin file (with support for multiple architectures) for upload to your Mattermost server:
 
