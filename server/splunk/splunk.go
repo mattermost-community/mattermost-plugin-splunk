@@ -118,7 +118,7 @@ func (s *splunk) SyncUser(mattermostUserID string) error {
 }
 
 // LoginUser changes authorized user.
-// id is either username or token of user.
+// id is either username or username/token of user.
 func (s *splunk) LoginUser(mattermostUserID string, server string, id string) error {
 	var isNew = true
 
@@ -133,6 +133,10 @@ func (s *splunk) LoginUser(mattermostUserID string, server string, id string) er
 		s.currentUser = u
 		isNew = false
 	} else {
+		if token == "" {
+			return errors.New("The token is empty to authenticate a user")
+		}
+
 		s.currentUser = store.SplunkUser{
 			Server: server,
 			Token:  token,
