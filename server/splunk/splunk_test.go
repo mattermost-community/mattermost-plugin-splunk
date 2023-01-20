@@ -74,7 +74,7 @@ func Test_splunk_extractUserInfo(t *testing.T) {
 			id:           "",
 			username:     "",
 			token:        "",
-			errorMessage: "Arguments to extract username and/or token must be 2",
+			errorMessage: "Please provide username and token like so: username/token. You can user username only if already authenticated",
 		},
 		{
 			name:         "id has more than 2 parameters, return error",
