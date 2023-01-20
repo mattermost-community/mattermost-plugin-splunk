@@ -175,7 +175,7 @@ func newSplunk(api PluginAPI, st store.Store) *splunk {
 
 func extractUserInfo(id string) (string, string, error) {
 	if id == "" {
-		return "", "", errors.New("Arguments to extract username and/or token must be 2")
+		return "", "", errors.New("Please provide username and token like so: username/token. You can user username only if already authenticated")
 	}
 
 	loginData := strings.Split(id, "/")
