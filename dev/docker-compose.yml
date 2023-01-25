@@ -11,3 +11,5 @@ services:
             - SPLUNK_PASSWORD=SplunkPass
         volumes:
             - ./scripts:/opt/splunk/bin/scripts
+            # Splunk Ansible override configuration
+            - ./default.yml:/tmp/defaults/default.yml
