@@ -6,4 +6,4 @@ splunk:
         directory: /opt/splunk/etc/system/local
         content:
           default:
-            hostname: <MY_ALERT_HOSTNAME>
+            hostname: <MY_ALERT_HOSTNAME>  # Example: https://XXXXX.ngrok.io
