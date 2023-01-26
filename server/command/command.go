@@ -20,12 +20,14 @@ const (
 	helpText       = `
 * /splunk help - print this help message
 * /splunk auth login [server base url] [username/token] - log into the splunk server
-* /splunk alert subscribe - subscribe to alerts
-* /splunk alert list - List all alerts
-* /splunk alert delete [alertID] - Remove an alert
 * /splunk log list - list names of logs on server
 * /splunk log [logname] - show specific log from server
 `
+	sysAdminHelp = `
+* /splunk alert subscribe - subscribe to alerts
+* /splunk alert list - List all alerts
+* /splunk alert delete [alertID] - Remove an alert
+	`
 	autoCompleteDescription = ""
 	autoCompleteHint        = ""
 	pluginDescription       = ""
@@ -162,7 +164,13 @@ type command struct {
 }
 
 func (c *command) help(_ ...string) (string, error) {
+	authorized, _ := authorizedSysAdmin(c.args.UserId)
 	helpText := helpTextHeader + helpText
+
+	if authorized {
+		helpText += sysAdminHelp
+	}
+
 	return helpText, nil
 }
 
@@ -339,4 +347,15 @@ func (c *command) authLogin(args ...string) (string, error) {
 func (c *command) authLogout(_ ...string) (string, error) {
 	_ = c.splunk.LogoutUser(c.args.UserId)
 	return "Successful logout", nil
+}
+
+func authorizedSysAdmin(p *Plugin, userID string) (bool, error) {
+	user, appErr := p.API.GetUser(userID)
+	if appErr != nil {
+		return false, appErr
+	}
+	if !strings.Contains(user.Roles, "system_admin") {
+		return false, nil
+	}
+	return true, nil
 }
