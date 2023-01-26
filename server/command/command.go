@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	apicommand "github.com/mattermost/mattermost-plugin-api/experimental/command"
 	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 	"github.com/pkg/errors"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"
@@ -49,8 +50,8 @@ type HandlerMap struct {
 }
 
 // NewHandler returns new Handler with given dependencies
-func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) Handler {
-	return newCommand(args, conf, a)
+func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk, api plugin.API) Handler {
+	return newCommand(args, conf, a, api)
 }
 
 // GetSlashCommand returns command to register
@@ -161,10 +162,11 @@ type command struct {
 	config  *config.Config
 	splunk  splunk.Splunk
 	handler HandlerMap
+	api     plugin.API
 }
 
 func (c *command) help(_ ...string) (string, error) {
-	authorized, _ := authorizedSysAdmin(c.args.UserId)
+	authorized, _ := authorizedSysAdmin(c.api, c.args.UserId)
 	helpText := helpTextHeader + helpText
 
 	if authorized {
@@ -174,11 +176,12 @@ func (c *command) help(_ ...string) (string, error) {
 	return helpText, nil
 }
 
-func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk) *command {
+func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk, api plugin.API) *command {
 	c := &command{
 		args:   args,
 		config: conf,
 		splunk: a,
+		api:    api,
 	}
 
 	err := a.SyncUser(args.UserId)
@@ -349,8 +352,8 @@ func (c *command) authLogout(_ ...string) (string, error) {
 	return "Successful logout", nil
 }
 
-func authorizedSysAdmin(p *Plugin, userID string) (bool, error) {
-	user, appErr := p.API.GetUser(userID)
+func authorizedSysAdmin(api plugin.API, userID string) (bool, error) {
+	user, appErr := api.GetUser(userID)
 	if appErr != nil {
 		return false, appErr
 	}

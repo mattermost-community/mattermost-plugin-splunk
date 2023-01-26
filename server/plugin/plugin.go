@@ -105,7 +105,7 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 		return p.sendEphemeralResponse(commandArgs, errorMsg), &model.AppError{Message: errorMsg}
 	}
 
-	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp)
+	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp, p.API)
 	args := strings.Fields(commandArgs.Command)
 
 	commandResponse, err := commandHandler.Handle(args...)
