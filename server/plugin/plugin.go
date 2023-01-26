@@ -74,7 +74,7 @@ func (p *SplunkPlugin) OnActivate() error {
 		p.httpHandler = api.NewHTTPHandler(p.sp, p.GetConfiguration())
 	}
 
-	cmd, err := GetSlashCommand(p.API)
+	cmd, err := p.GetSlashCommand(p.API)
 	if err != nil {
 		return errors.Wrap(err, "failed to get command")
 	}
@@ -106,7 +106,7 @@ func (p *SplunkPlugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *
 		return p.sendEphemeralResponse(commandArgs, errorMsg), &model.AppError{Message: errorMsg}
 	}
 
-	commandHandler := NewHandler(commandArgs, p)
+	commandHandler := p.NewHandler(commandArgs)
 	args := strings.Fields(commandArgs.Command)
 
 	commandResponse, err := commandHandler.Handle(args...)

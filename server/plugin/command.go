@@ -51,12 +51,12 @@ type HandlerMap struct {
 }
 
 // NewHandler returns new Handler with given dependencies
-func NewHandler(args *model.CommandArgs, p *SplunkPlugin) Handler {
+func (p *SplunkPlugin) NewHandler(args *model.CommandArgs) Handler {
 	return newCommand(args, p)
 }
 
 // GetSlashCommand returns command to register
-func GetSlashCommand(api apicommand.PluginAPI) (*model.Command, error) {
+func (p *SplunkPlugin) GetSlashCommand(api apicommand.PluginAPI) (*model.Command, error) {
 	iconData, err := apicommand.GetIconData(api, "assets/command.svg")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get icon data")
