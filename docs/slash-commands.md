@@ -1,6 +1,6 @@
 ## Slash commands
 
-* **Authenticate user:** Use `/splunk auth login [server base url] [token]`. you must be logged into the system before you use any slash commands regarding logging. To authenticate the user you can use this slash command with two required parameters Splunk server base URL, Splunk username, or token. If you already logged in to a plugin with a token, the future logins can be done by providing only the username too. The command is `/splunk auth login [server base url] [splunk username]`. After successful authentication this message is shown:
+* **Authenticate user:** Use `/splunk auth login [server base url] [splunk username]/[token]`. you must be logged into the system before you use any slash commands regarding logging. To authenticate the user you can use this slash command with two required parameters Splunk server base URL, Splunk username, or token. If you already logged in to a plugin with a token, the future logins can be done by providing only the username too. The command is `/splunk auth login [server base url] [splunk username]`. After successful authentication this message is shown:
 
     ![GitHub plugin screenshot](../images/auth_success.png)
 
