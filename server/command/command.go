@@ -166,10 +166,10 @@ type command struct {
 }
 
 func (c *command) help(_ ...string) (string, error) {
-	authorized, _ := authorizedSysAdmin(c.api, c.args.UserId)
+	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
 	helpText := helpTextHeader + helpText
 
-	if authorized {
+	if isAuthorized {
 		helpText += sysAdminHelp
 	}
 
@@ -225,6 +225,12 @@ func alertSubscriptionMessage(siteURL, secret string) (string, string) {
 }
 
 func (c *command) subscribeAlert(_ ...string) (string, error) {
+	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+
+	if !isAuthorized {
+		return "", errors.New("You need to be a sysadmin to perform this action")
+	}
+
 	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
 	err := c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
@@ -236,6 +242,12 @@ func (c *command) subscribeAlert(_ ...string) (string, error) {
 }
 
 func (c *command) listAlert(_ ...string) (string, error) {
+	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+
+	if !isAuthorized {
+		return "", errors.New("You need to be a sysadmin to perform this action")
+	}
+
 	list, err := c.splunk.ListAlert(c.args.ChannelId)
 	if err != nil {
 		c.splunk.LogError("error while listing alerts", "error", err.Error())
@@ -246,6 +258,12 @@ func (c *command) listAlert(_ ...string) (string, error) {
 }
 
 func (c *command) deleteAlert(args ...string) (string, error) {
+	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+
+	if !isAuthorized {
+		return "", errors.New("You need to be a sysadmin to perform this action")
+	}
+
 	if len(args) != 1 {
 		return "Please enter correct number of arguments", nil
 	}
@@ -352,7 +370,7 @@ func (c *command) authLogout(_ ...string) (string, error) {
 	return "Successful logout", nil
 }
 
-func authorizedSysAdmin(api plugin.API, userID string) (bool, error) {
+func isAuthorizedSysAdmin(api plugin.API, userID string) (bool, error) {
 	user, appErr := api.GetUser(userID)
 	if appErr != nil {
 		return false, appErr
