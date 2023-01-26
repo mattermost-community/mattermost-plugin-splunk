@@ -1,8 +1,9 @@
-package command
+package plugin
 
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"strings"
 
 	"github.com/google/uuid"
@@ -50,8 +51,8 @@ type HandlerMap struct {
 }
 
 // NewHandler returns new Handler with given dependencies
-func NewHandler(args *model.CommandArgs, conf *config.Config, a splunk.Splunk, api plugin.API) Handler {
-	return newCommand(args, conf, a, api)
+func NewHandler(args *model.CommandArgs, p *SplunkPlugin) Handler {
+	return newCommand(args, p)
 }
 
 // GetSlashCommand returns command to register
@@ -176,15 +177,15 @@ func (c *command) help(_ ...string) (string, error) {
 	return helpText, nil
 }
 
-func newCommand(args *model.CommandArgs, conf *config.Config, a splunk.Splunk, api plugin.API) *command {
+func newCommand(args *model.CommandArgs, p *SplunkPlugin) *command {
 	c := &command{
 		args:   args,
-		config: conf,
-		splunk: a,
-		api:    api,
+		config: p.GetConfiguration(),
+		splunk: p.sp,
+		api:    p.API,
 	}
 
-	err := a.SyncUser(args.UserId)
+	err := p.sp.SyncUser(args.UserId)
 	if err != nil {
 		log.Printf("Error occurred while syncing user stored in KVStore :%v\n", err)
 	}
@@ -379,4 +380,16 @@ func isAuthorizedSysAdmin(api plugin.API, userID string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func parseServerURL(u string) (string, error) {
+	ur, err := url.Parse(u)
+	if err != nil {
+		return "", errors.Wrap(err, "bad url")
+	}
+	if ur.Scheme != "http" && ur.Scheme != "https" {
+		return "", errors.New("bad scheme")
+	}
+
+	return ur.Scheme + "://" + ur.Host, err
 }

@@ -14,7 +14,6 @@ import (
 	mattermostPlugin "github.com/mattermost/mattermost-server/v6/plugin"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/api"
-	"github.com/mattermost/mattermost-plugin-splunk/server/command"
 	"github.com/mattermost/mattermost-plugin-splunk/server/config"
 	"github.com/mattermost/mattermost-plugin-splunk/server/splunk"
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
@@ -30,9 +29,11 @@ type Plugin interface {
 	ServeHTTP(pc *mattermostPlugin.Context, w http.ResponseWriter, r *http.Request)
 }
 
+var _ Plugin = (*SplunkPlugin)(nil)
+
 // NewWithConfig creates new plugin object from configuration
 func NewWithConfig(conf *config.Config) Plugin {
-	p := &plugin{
+	p := &SplunkPlugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
 	}
@@ -41,7 +42,7 @@ func NewWithConfig(conf *config.Config) Plugin {
 
 // NewWithStore creates new plugin object from configuration and store object
 func NewWithStore(store store.Store, conf *config.Config) Plugin {
-	p := &plugin{
+	p := &SplunkPlugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
 	}
@@ -53,7 +54,7 @@ func NewWithStore(store store.Store, conf *config.Config) Plugin {
 
 // NewWithSplunk creates new plugin object from splunk
 func NewWithSplunk(sp splunk.Splunk, conf *config.Config) Plugin {
-	p := &plugin{
+	p := &SplunkPlugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
 		sp:                sp,
@@ -64,7 +65,7 @@ func NewWithSplunk(sp splunk.Splunk, conf *config.Config) Plugin {
 }
 
 // OnActivate called when plugin is activated
-func (p *plugin) OnActivate() error {
+func (p *SplunkPlugin) OnActivate() error {
 	rand.Seed(time.Now().UnixNano())
 
 	if p.sp == nil {
@@ -73,7 +74,7 @@ func (p *plugin) OnActivate() error {
 		p.httpHandler = api.NewHTTPHandler(p.sp, p.GetConfiguration())
 	}
 
-	cmd, err := command.GetSlashCommand(p.API)
+	cmd, err := GetSlashCommand(p.API)
 	if err != nil {
 		return errors.Wrap(err, "failed to get command")
 	}
@@ -98,14 +99,14 @@ func (p *plugin) OnActivate() error {
 }
 
 // ExecuteCommand hook is called when slash command is submitted
-func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
+func (p *SplunkPlugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	mattermostUserID := commandArgs.UserId
 	if len(mattermostUserID) == 0 {
 		errorMsg := "Not authorized"
 		return p.sendEphemeralResponse(commandArgs, errorMsg), &model.AppError{Message: errorMsg}
 	}
 
-	commandHandler := command.NewHandler(commandArgs, p.GetConfiguration(), p.sp, p.API)
+	commandHandler := NewHandler(commandArgs, p)
 	args := strings.Fields(commandArgs.Command)
 
 	commandResponse, err := commandHandler.Handle(args...)
@@ -122,7 +123,7 @@ func (p *plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.
 	}
 }
 
-func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
+func (p *SplunkPlugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
 	p.API.SendEphemeralPost(args.UserId, &model.Post{
 		UserId:    p.sp.BotUser(),
 		ChannelId: args.ChannelId,
@@ -132,7 +133,7 @@ func (p *plugin) sendEphemeralResponse(args *model.CommandArgs, text string) *mo
 }
 
 // OnConfigurationChange is invoked when Config changes may have been made.
-func (p *plugin) OnConfigurationChange() error {
+func (p *SplunkPlugin) OnConfigurationChange() error {
 	var configuration = new(config.Config)
 
 	// Load the public Config fields from the Mattermost server Config.
@@ -145,14 +146,14 @@ func (p *plugin) OnConfigurationChange() error {
 	return nil
 }
 
-func (p *plugin) ServeHTTP(_ *mattermostPlugin.Context, w http.ResponseWriter, req *http.Request) {
+func (p *SplunkPlugin) ServeHTTP(_ *mattermostPlugin.Context, w http.ResponseWriter, req *http.Request) {
 	p.httpHandler.ServeHTTP(w, req)
 }
 
 // GetConfiguration retrieves the active Config under lock, making it safe to use
 // concurrently. The active Config may change underneath the client of this method, but
 // the struct returned by this API call is considered immutable.
-func (p *plugin) GetConfiguration() *config.Config {
+func (p *SplunkPlugin) GetConfiguration() *config.Config {
 	p.configurationLock.RLock()
 	defer p.configurationLock.RUnlock()
 
@@ -163,7 +164,7 @@ func (p *plugin) GetConfiguration() *config.Config {
 	return p.config
 }
 
-type plugin struct {
+type SplunkPlugin struct {
 	mattermostPlugin.MattermostPlugin
 
 	httpHandler http.Handler
@@ -187,7 +188,7 @@ type plugin struct {
 // This method panics if setConfiguration is called with the existing Config. This almost
 // certainly means that the Config was modified without being cloned and may result in
 // an unsafe access.
-func (p *plugin) setConfiguration(configuration *config.Config) {
+func (p *SplunkPlugin) setConfiguration(configuration *config.Config) {
 	p.configurationLock.Lock()
 	defer p.configurationLock.Unlock()
 

@@ -1,4 +1,4 @@
-package command
+package plugin
 
 import "testing"
 
