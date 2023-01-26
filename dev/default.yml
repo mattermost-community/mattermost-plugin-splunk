@@ -1,0 +1,9 @@
+---
+splunk:
+  conf:
+    - key: alert_actions
+      value:
+        directory: /opt/splunk/etc/system/local
+        content:
+          default:
+            hostname: <MY_ALERT_HOSTNAME>  # Example: https://XXXXX.ngrok.io

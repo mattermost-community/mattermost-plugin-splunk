@@ -10,14 +10,14 @@ Note that this project uses [Go modules](https://github.com/golang/go/wiki/Modul
 
 ### Running a Splunk server with Docker
 
-There is a [docker-compose.yml](https://github.com/mattermost/mattermost-plugin-splunk/blob/master/dev/docker-compose.yml) in the `dev` folder of the repository, configured to run a Splunk server for development. You can run `make splunk` in the root of the repository to spin up the Splunk server. The Splunk web application will be served at http://localhost:8000.
+There is a [docker-compose.yml](https://github.com/mattermost/mattermost-plugin-splunk/blob/master/dev/docker-compose.yml) in the `dev` folder of the repository, configured to run a Splunk server for development. You can run `make splunk` in the root of the repository to spin up the Splunk server. The Splunk web application will be served at `http://localhost:8000` and the API will be served at `https://localhost:8089`.
 
 The `SPLUNK_PASSWORD` environment variable is set to `SplunkPass`, as defined in the `docker-compose.yml` file. You can login with these credentials:
 
 - Username: `admin`
 - Password: `SplunkPass`
 
-The files at [dev/splunk_scripts](https://github.com/mattermost/mattermost-plugin-splunk/tree/master/dev/splunk_scripts) are mapped as a volume on the `scripts` folder in the Docker container. Splunk is able to access the files in this folder, so feel free to add files to this folder on your computer for usage in Splunk.
+If you want to modify the default Alert hostname, you can do so editing the `default.yml` file and replace `<MY_ALERT_HOSTNAME>` with your valid hostname (ex: `https://myhost.ngrok.io`).
 
 ### Building And Deployment
 

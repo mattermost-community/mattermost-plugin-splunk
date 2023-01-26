@@ -60,3 +60,55 @@ func Test_splunk_ChangeUser(t *testing.T) {
 		})
 	}
 }
+
+func Test_splunk_extractUserInfo(t *testing.T) {
+	tests := []struct {
+		name         string
+		id           string
+		username     string
+		token        string
+		errorMessage string
+	}{
+		{
+			name:         "id is empty, return error",
+			id:           "",
+			username:     "",
+			token:        "",
+			errorMessage: "Please provide username and token like so: username/token. You can user username only if already authenticated",
+		},
+		{
+			name:         "id has more than 2 parameters, return error",
+			id:           "johndoe/token/more",
+			username:     "",
+			token:        "",
+			errorMessage: "Arguments to extract username and/or token must be 2",
+		},
+		{
+			name:         "id has only the username parameter, returns valid username",
+			id:           "johndoe",
+			username:     "johndoe",
+			token:        "",
+			errorMessage: "",
+		},
+		{
+			name:         "id has username and token parameters, returns username and token",
+			id:           "johndoe/token",
+			username:     "johndoe",
+			token:        "token",
+			errorMessage: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			username, token, err := extractUserInfo(tt.id)
+
+			if tt.errorMessage != "" {
+				assert.Equal(t, tt.errorMessage, err.Error())
+				return
+			}
+
+			assert.Equal(t, tt.username, username)
+			assert.Equal(t, tt.token, token)
+		})
+	}
+}

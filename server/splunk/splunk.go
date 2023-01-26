@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/mattermost/mattermost-plugin-splunk/server/store"
 
@@ -117,18 +118,28 @@ func (s *splunk) SyncUser(mattermostUserID string) error {
 }
 
 // LoginUser changes authorized user.
-// id is either username or token of user.
+// id is either username or username/token of user.
 func (s *splunk) LoginUser(mattermostUserID string, server string, id string) error {
 	var isNew = true
 
-	// check if we already have token for given id
-	if u, err := s.Store.User(mattermostUserID, server, id); err == nil {
+	// id can be username or username/token
+	username, token, err := extractUserInfo(id)
+	if err != nil {
+		return err
+	}
+
+	// check if we already have token for given username
+	if u, err := s.Store.User(mattermostUserID, server, username); err == nil {
 		s.currentUser = u
 		isNew = false
 	} else {
+		if token == "" {
+			return errors.New("The token is empty to authenticate a user")
+		}
+
 		s.currentUser = store.SplunkUser{
 			Server: server,
-			Token:  id,
+			Token:  token,
 		}
 	}
 
@@ -160,4 +171,22 @@ func newSplunk(api PluginAPI, st store.Store) *splunk {
 	}
 
 	return s
+}
+
+func extractUserInfo(id string) (string, string, error) {
+	if id == "" {
+		return "", "", errors.New("Please provide username and token like so: username/token. You can user username only if already authenticated")
+	}
+
+	loginData := strings.Split(id, "/")
+	username := loginData[0]
+	token := ""
+
+	if len(loginData) > 2 {
+		return "", "", errors.New("Arguments to extract username and/or token must be 2")
+	} else if len(loginData) == 2 {
+		token = loginData[1]
+	}
+
+	return username, token, nil
 }
