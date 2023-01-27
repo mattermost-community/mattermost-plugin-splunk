@@ -52,9 +52,18 @@ type HandlerMap struct {
 	defaultHandler HandlerFunc
 }
 
+// command stores command specific information
+type command struct {
+	args    *model.CommandArgs
+	config  *config.Config
+	splunk  splunk.Splunk
+	handler HandlerMap
+	api     plugin.API
+}
+
 // NewHandler returns new Handler with given dependencies
 func (p *SplunkPlugin) NewHandler(args *model.CommandArgs) Handler {
-	return newCommand(args, p)
+	return p.newCommand(args)
 }
 
 // GetSlashCommand returns command to register
@@ -80,106 +89,7 @@ func (p *SplunkPlugin) GetSlashCommand(api apicommand.PluginAPI) (*model.Command
 	}, nil
 }
 
-func addSubCommands(splunk *model.AutocompleteData) {
-	splunk.AddCommand(createAlertCommand())
-	splunk.AddCommand(createAuthCommand())
-	splunk.AddCommand(createlogCommand())
-	splunk.AddCommand(createHelpCommand())
-}
-
-func createAlertCommand() *model.AutocompleteData {
-	alert := model.NewAutocompleteData(
-		"alert", "[command]", "Available commands: subscribe, list, delete")
-
-	subscribe := model.NewAutocompleteData(
-		"subscribe", "", "Subscribe to an alert")
-	alert.AddCommand(subscribe)
-
-	deleteAlert := model.NewAutocompleteData(
-		"delete", "", "Remove an alert")
-	deleteAlert.AddTextArgument("AlertId to remove", "[alertid]", "")
-
-	alert.AddCommand(deleteAlert)
-	listAlert := model.NewAutocompleteData(
-		"list", "", "List all alerts")
-	alert.AddCommand(listAlert)
-
-	return alert
-}
-
-func createAuthCommand() *model.AutocompleteData {
-	auth := model.NewAutocompleteData(
-		"auth", "login [server base url] [username/token]", "log into the splunk server")
-
-	flag := []model.AutocompleteListItem{
-		{HelpText: "Log into the splunk server", Item: "login"},
-	}
-
-	auth.AddStaticListArgument("Login to splunk server [server base url] [username/token]", true, flag)
-	auth.AddTextArgument("[server base url]", "Enter the server URL, e.g. https://your-mattermost-url.com", "")
-	auth.AddTextArgument("[username/token]", "Enter the [username/token]", "")
-
-	return auth
-}
-
-func createlogCommand() *model.AutocompleteData {
-	log := model.NewAutocompleteData(
-		"log", "[list / logname]", "")
-
-	flag := []model.AutocompleteListItem{
-		{HelpText: "List all the log group", Item: "list"},
-	}
-
-	log.AddStaticListArgument("List all the log group", false, flag)
-	log.AddTextArgument("[logname]", "Show specific log from server", "")
-
-	return log
-}
-
-func createHelpCommand() *model.AutocompleteData {
-	help := model.NewAutocompleteData(
-		"help", "", "Display slash command help text")
-
-	return help
-}
-
-func (c *command) Handle(args ...string) (string, error) {
-	ch := c.handler
-	if len(args) == 0 || args[0] != "/"+slashCommandName {
-		return ch.defaultHandler(args...)
-	}
-	args = args[1:]
-
-	for n := len(args); n > 0; n-- {
-		h := ch.handlers[strings.Join(args[:n], "/")]
-		if h != nil {
-			return h(args[n:]...)
-		}
-	}
-	return ch.defaultHandler(args...)
-}
-
-// command stores command specific information
-type command struct {
-	args    *model.CommandArgs
-	config  *config.Config
-	splunk  splunk.Splunk
-	handler HandlerMap
-	api     plugin.API
-}
-
-func (c *command) help(_ ...string) (string, error) {
-	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
-	helpText := helpTextHeader + helpText
-
-	if isAuthorized {
-		helpText += sysAdminHelp
-	}
-
-	return helpText, nil
-}
-
-func newCommand(args *model.CommandArgs, p *SplunkPlugin) *command {
+func (p *SplunkPlugin) newCommand(args *model.CommandArgs) *command {
 	c := &command{
 		args:   args,
 		config: p.GetConfiguration(),
@@ -210,21 +120,31 @@ func newCommand(args *model.CommandArgs, p *SplunkPlugin) *command {
 	return c
 }
 
-// alertSubscriptionMessage creates message for alert subscription
-// returns message text and unique id for alert
-func alertSubscriptionMessage(siteURL, secret string) (string, string) {
-	id := uuid.New()
-	post := fmt.Sprintf(
-		"Added alert\n"+
-			"Copy this [webhook url](%s/plugins/%s%s%s?id=%s&secret=%s) to your splunk alert action.",
-		siteURL,
-		"com.mattermost.plugin-splunk",
-		config.APIPath,
-		api.WebhookEndpoint,
-		id,
-		secret,
-	)
-	return post, id.String()
+func (c *command) Handle(args ...string) (string, error) {
+	ch := c.handler
+	if len(args) == 0 || args[0] != "/"+slashCommandName {
+		return ch.defaultHandler(args...)
+	}
+	args = args[1:]
+
+	for n := len(args); n > 0; n-- {
+		h := ch.handlers[strings.Join(args[:n], "/")]
+		if h != nil {
+			return h(args[n:]...)
+		}
+	}
+	return ch.defaultHandler(args...)
+}
+
+func (c *command) help(_ ...string) (string, error) {
+	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	helpText := helpTextHeader + helpText
+
+	if isAuthorized {
+		helpText += sysAdminHelp
+	}
+
+	return helpText, nil
 }
 
 func (c *command) subscribeAlert(_ ...string) (string, error) {
@@ -298,6 +218,33 @@ func (c *command) getLogSourceList(_ ...string) (string, error) {
 	return createMDForLogsList(c.splunk.ListLogs(), "No logs available"), nil
 }
 
+func (c *command) authUser(_ ...string) (string, error) {
+	return fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName), nil
+}
+
+func (c *command) authLogin(args ...string) (string, error) {
+	if len(args) < 2 {
+		return "Must have 2 arguments", nil
+	}
+
+	u, err := parseServerURL(args[0])
+	if err != nil {
+		return "Bad server URL", nil
+	}
+
+	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
+	if err != nil {
+		return "Wrong credentials: " + err.Error(), nil
+	}
+
+	return "Successfully authenticated", nil
+}
+
+func (c *command) authLogout(_ ...string) (string, error) {
+	_ = c.splunk.LogoutUser(c.args.UserId)
+	return "Successful logout", nil
+}
+
 func createMDForLogs(results splunk.LogResults) string {
 	fieldNames := make(map[string]int)
 	index := 0
@@ -346,31 +293,84 @@ func createMDForLogsList(results []string, fallback string) string {
 	return res
 }
 
-func (c *command) authUser(_ ...string) (string, error) {
-	return fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName), nil
+func addSubCommands(splunk *model.AutocompleteData) {
+	splunk.AddCommand(createAlertCommand())
+	splunk.AddCommand(createAuthCommand())
+	splunk.AddCommand(createlogCommand())
+	splunk.AddCommand(createHelpCommand())
 }
 
-func (c *command) authLogin(args ...string) (string, error) {
-	if len(args) < 2 {
-		return "Must have 2 arguments", nil
-	}
+func createAlertCommand() *model.AutocompleteData {
+	alert := model.NewAutocompleteData(
+		"alert", "[command]", "Available commands: subscribe, list, delete")
 
-	u, err := parseServerURL(args[0])
-	if err != nil {
-		return "Bad server URL", nil
-	}
+	subscribe := model.NewAutocompleteData(
+		"subscribe", "", "Subscribe to an alert")
+	alert.AddCommand(subscribe)
 
-	err = c.splunk.LoginUser(c.args.UserId, u, args[1])
-	if err != nil {
-		return "Wrong credentials: " + err.Error(), nil
-	}
+	deleteAlert := model.NewAutocompleteData(
+		"delete", "", "Remove an alert")
+	deleteAlert.AddTextArgument("AlertId to remove", "[alertid]", "")
 
-	return "Successfully authenticated", nil
+	alert.AddCommand(deleteAlert)
+	listAlert := model.NewAutocompleteData(
+		"list", "", "List all alerts")
+	alert.AddCommand(listAlert)
+
+	return alert
 }
 
-func (c *command) authLogout(_ ...string) (string, error) {
-	_ = c.splunk.LogoutUser(c.args.UserId)
-	return "Successful logout", nil
+func createAuthCommand() *model.AutocompleteData {
+	auth := model.NewAutocompleteData(
+		"auth", "login [server base url] [username/token]", "log into the splunk server")
+
+	flag := []model.AutocompleteListItem{
+		{HelpText: "Log into the splunk server", Item: "login"},
+	}
+
+	auth.AddStaticListArgument("Login to splunk server [server base url] [username/token]", true, flag)
+	auth.AddTextArgument("[server base url]", "Enter the server URL, e.g. https://your-mattermost-url.com", "")
+	auth.AddTextArgument("[username/token]", "Enter the [username/token]", "")
+
+	return auth
+}
+
+func createlogCommand() *model.AutocompleteData {
+	log := model.NewAutocompleteData(
+		"log", "[list / logname]", "")
+
+	flag := []model.AutocompleteListItem{
+		{HelpText: "List all the log group", Item: "list"},
+	}
+
+	log.AddStaticListArgument("List all the log group", false, flag)
+	log.AddTextArgument("[logname]", "Show specific log from server", "")
+
+	return log
+}
+
+func createHelpCommand() *model.AutocompleteData {
+	help := model.NewAutocompleteData(
+		"help", "", "Display slash command help text")
+
+	return help
+}
+
+// alertSubscriptionMessage creates message for alert subscription
+// returns message text and unique id for alert
+func alertSubscriptionMessage(siteURL, secret string) (string, string) {
+	id := uuid.New()
+	post := fmt.Sprintf(
+		"Added alert\n"+
+			"Copy this [webhook url](%s/plugins/%s%s%s?id=%s&secret=%s) to your splunk alert action.",
+		siteURL,
+		"com.mattermost.plugin-splunk",
+		config.APIPath,
+		api.WebhookEndpoint,
+		id,
+		secret,
+	)
+	return post, id.String()
 }
 
 func isAuthorizedSysAdmin(api plugin.API, userID string) (bool, error) {
