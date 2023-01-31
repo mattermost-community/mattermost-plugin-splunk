@@ -139,7 +139,7 @@ func (c *CommandHandler) Handle(args ...string) (string, error) {
 func (c *CommandHandler) help(_ ...string) (string, error) {
 	isAuthorized, err := isAuthorizedSysAdmin(c.api, c.args.UserId)
 	if err != nil {
-		return helpText, err
+		return "", errors.New("There was an error retrieving the user")
 	}
 
 	helpText := helpTextHeader + helpText
@@ -152,14 +152,18 @@ func (c *CommandHandler) help(_ ...string) (string, error) {
 }
 
 func (c *CommandHandler) subscribeAlert(_ ...string) (string, error) {
-	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	isAuthorized, err := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	if err != nil {
+		c.splunk.LogError("error while subscribing alert, couldn't retrieve the user", "error", err.Error())
+		return "", errors.New("There was an error retrieving the user")
+	}
 
 	if !isAuthorized {
 		return "", errors.New("You need to be a sysadmin to perform this action")
 	}
 
 	message, id := alertSubscriptionMessage(c.args.SiteURL, c.config.Secret)
-	err := c.splunk.AddAlert(c.args.ChannelId, id)
+	err = c.splunk.AddAlert(c.args.ChannelId, id)
 	if err != nil {
 		c.splunk.LogError("error while subscribing alert", "error", err.Error())
 		message = err.Error()
@@ -169,7 +173,10 @@ func (c *CommandHandler) subscribeAlert(_ ...string) (string, error) {
 }
 
 func (c *CommandHandler) listAlert(_ ...string) (string, error) {
-	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	isAuthorized, err := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	if err != nil {
+		return "", errors.New("There was an error retrieving the user")
+	}
 
 	if !isAuthorized {
 		return "", errors.New("You need to be a sysadmin to perform this action")
@@ -185,7 +192,10 @@ func (c *CommandHandler) listAlert(_ ...string) (string, error) {
 }
 
 func (c *CommandHandler) deleteAlert(args ...string) (string, error) {
-	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	isAuthorized, err := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	if err != nil {
+		return "", err
+	}
 
 	if !isAuthorized {
 		return "", errors.New("You need to be a sysadmin to perform this action")
@@ -196,7 +206,7 @@ func (c *CommandHandler) deleteAlert(args ...string) (string, error) {
 	}
 
 	var message = "Successfully removed alert"
-	err := c.splunk.DeleteAlert(c.args.ChannelId, args[0])
+	err = c.splunk.DeleteAlert(c.args.ChannelId, args[0])
 	if err != nil {
 		c.splunk.LogError("error while deleting alert", "error", err.Error())
 		message = "Error while removing alert. " + err.Error()
