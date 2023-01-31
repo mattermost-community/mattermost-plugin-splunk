@@ -21,14 +21,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Plugin is interface expected by the Mattermost server to communicate between the server and plugin processes.
-type Plugin interface {
-	splunk.PluginAPI
-	OnActivate() error
-	OnConfigurationChange() error
-	ServeHTTP(pc *mattermostPlugin.Context, w http.ResponseWriter, r *http.Request)
-}
-
 type SplunkPlugin struct {
 	mattermostPlugin.MattermostPlugin
 
@@ -44,10 +36,8 @@ type SplunkPlugin struct {
 	config *config.Config
 }
 
-var _ Plugin = (*SplunkPlugin)(nil)
-
 // NewWithConfig creates new plugin object from configuration
-func NewWithConfig(conf *config.Config) Plugin {
+func NewWithConfig(conf *config.Config) *SplunkPlugin {
 	p := &SplunkPlugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
@@ -56,7 +46,7 @@ func NewWithConfig(conf *config.Config) Plugin {
 }
 
 // NewWithStore creates new plugin object from configuration and store object
-func NewWithStore(store store.Store, conf *config.Config) Plugin {
+func NewWithStore(store store.Store, conf *config.Config) *SplunkPlugin {
 	p := &SplunkPlugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
@@ -68,7 +58,7 @@ func NewWithStore(store store.Store, conf *config.Config) Plugin {
 }
 
 // NewWithSplunk creates new plugin object from splunk
-func NewWithSplunk(sp splunk.Splunk, conf *config.Config) Plugin {
+func NewWithSplunk(sp splunk.Splunk, conf *config.Config) *SplunkPlugin {
 	p := &SplunkPlugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
