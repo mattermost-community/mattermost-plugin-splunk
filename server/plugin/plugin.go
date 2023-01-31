@@ -29,6 +29,21 @@ type Plugin interface {
 	ServeHTTP(pc *mattermostPlugin.Context, w http.ResponseWriter, r *http.Request)
 }
 
+type SplunkPlugin struct {
+	mattermostPlugin.MattermostPlugin
+
+	httpHandler http.Handler
+
+	sp splunk.Splunk
+
+	// configurationLock synchronizes access to the configuration.
+	configurationLock *sync.RWMutex
+
+	// configuration is the active plugin configuration. Consult getConfiguration and
+	// setConfiguration for usage.
+	config *config.Config
+}
+
 var _ Plugin = (*SplunkPlugin)(nil)
 
 // NewWithConfig creates new plugin object from configuration
@@ -162,21 +177,6 @@ func (p *SplunkPlugin) GetConfiguration() *config.Config {
 	}
 
 	return p.config
-}
-
-type SplunkPlugin struct {
-	mattermostPlugin.MattermostPlugin
-
-	httpHandler http.Handler
-
-	sp splunk.Splunk
-
-	// configurationLock synchronizes access to the configuration.
-	configurationLock *sync.RWMutex
-
-	// configuration is the active plugin configuration. Consult getConfiguration and
-	// setConfiguration for usage.
-	config *config.Config
 }
 
 // setConfiguration replaces the active Config under lock.
