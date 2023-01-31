@@ -53,7 +53,7 @@ type HandlerMap struct {
 }
 
 // command stores command specific information
-type command struct {
+type CommandHandler struct {
 	args    *model.CommandArgs
 	config  *config.Config
 	splunk  splunk.Splunk
@@ -67,8 +67,8 @@ func (p *SplunkPlugin) NewHandler(args *model.CommandArgs) Handler {
 }
 
 // GetSlashCommand returns command to register
-func (p *SplunkPlugin) GetSlashCommand(api apicommand.PluginAPI) (*model.Command, error) {
-	iconData, err := apicommand.GetIconData(api, "assets/command.svg")
+func (p *SplunkPlugin) GetSlashCommand() (*model.Command, error) {
+	iconData, err := apicommand.GetIconData(p.API, "assets/command.svg")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get icon data")
 	}
@@ -89,8 +89,8 @@ func (p *SplunkPlugin) GetSlashCommand(api apicommand.PluginAPI) (*model.Command
 	}, nil
 }
 
-func (p *SplunkPlugin) newCommand(args *model.CommandArgs) *command {
-	c := &command{
+func (p *SplunkPlugin) newCommand(args *model.CommandArgs) *CommandHandler {
+	c := &CommandHandler{
 		args:   args,
 		config: p.GetConfiguration(),
 		splunk: p.sp,
@@ -120,7 +120,7 @@ func (p *SplunkPlugin) newCommand(args *model.CommandArgs) *command {
 	return c
 }
 
-func (c *command) Handle(args ...string) (string, error) {
+func (c *CommandHandler) Handle(args ...string) (string, error) {
 	ch := c.handler
 	if len(args) == 0 || args[0] != "/"+slashCommandName {
 		return ch.defaultHandler(args...)
@@ -136,8 +136,12 @@ func (c *command) Handle(args ...string) (string, error) {
 	return ch.defaultHandler(args...)
 }
 
-func (c *command) help(_ ...string) (string, error) {
-	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
+func (c *CommandHandler) help(_ ...string) (string, error) {
+	isAuthorized, err := isAuthorizedSysAdmin(c.api, c.args.UserId)
+	if err != nil {
+		return helpText, err
+	}
+
 	helpText := helpTextHeader + helpText
 
 	if isAuthorized {
@@ -147,7 +151,7 @@ func (c *command) help(_ ...string) (string, error) {
 	return helpText, nil
 }
 
-func (c *command) subscribeAlert(_ ...string) (string, error) {
+func (c *CommandHandler) subscribeAlert(_ ...string) (string, error) {
 	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
 
 	if !isAuthorized {
@@ -164,7 +168,7 @@ func (c *command) subscribeAlert(_ ...string) (string, error) {
 	return message, nil
 }
 
-func (c *command) listAlert(_ ...string) (string, error) {
+func (c *CommandHandler) listAlert(_ ...string) (string, error) {
 	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
 
 	if !isAuthorized {
@@ -180,7 +184,7 @@ func (c *command) listAlert(_ ...string) (string, error) {
 	return createMDForLogsList(list, "No alerts available"), nil
 }
 
-func (c *command) deleteAlert(args ...string) (string, error) {
+func (c *CommandHandler) deleteAlert(args ...string) (string, error) {
 	isAuthorized, _ := isAuthorizedSysAdmin(c.api, c.args.UserId)
 
 	if !isAuthorized {
@@ -201,7 +205,7 @@ func (c *command) deleteAlert(args ...string) (string, error) {
 	return message, nil
 }
 
-func (c *command) getLogs(args ...string) (string, error) {
+func (c *CommandHandler) getLogs(args ...string) (string, error) {
 	if len(args) != 1 {
 		return "Please enter correct number of arguments", nil
 	}
@@ -214,15 +218,15 @@ func (c *command) getLogs(args ...string) (string, error) {
 	return createMDForLogs(logResults), nil
 }
 
-func (c *command) getLogSourceList(_ ...string) (string, error) {
+func (c *CommandHandler) getLogSourceList(_ ...string) (string, error) {
 	return createMDForLogsList(c.splunk.ListLogs(), "No logs available"), nil
 }
 
-func (c *command) authUser(_ ...string) (string, error) {
+func (c *CommandHandler) authUser(_ ...string) (string, error) {
 	return fmt.Sprintf("Server : %s\nUser : %s", c.splunk.User().Server, c.splunk.User().UserName), nil
 }
 
-func (c *command) authLogin(args ...string) (string, error) {
+func (c *CommandHandler) authLogin(args ...string) (string, error) {
 	if len(args) < 2 {
 		return "Must have 2 arguments", nil
 	}
@@ -240,7 +244,7 @@ func (c *command) authLogin(args ...string) (string, error) {
 	return "Successfully authenticated", nil
 }
 
-func (c *command) authLogout(_ ...string) (string, error) {
+func (c *CommandHandler) authLogout(_ ...string) (string, error) {
 	_ = c.splunk.LogoutUser(c.args.UserId)
 	return "Successful logout", nil
 }

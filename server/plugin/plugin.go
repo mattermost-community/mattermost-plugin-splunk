@@ -74,7 +74,7 @@ func (p *SplunkPlugin) OnActivate() error {
 		p.httpHandler = api.NewHTTPHandler(p.sp, p.GetConfiguration())
 	}
 
-	cmd, err := p.GetSlashCommand(p.API)
+	cmd, err := p.GetSlashCommand()
 	if err != nil {
 		return errors.Wrap(err, "failed to get command")
 	}
