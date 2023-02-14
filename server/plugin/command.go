@@ -62,12 +62,12 @@ type CommandHandler struct {
 }
 
 // NewHandler returns new Handler with given dependencies
-func (p *SplunkPlugin) NewHandler(args *model.CommandArgs) Handler {
+func (p *Plugin) NewHandler(args *model.CommandArgs) Handler {
 	return p.newCommand(args)
 }
 
 // GetSlashCommand returns command to register
-func (p *SplunkPlugin) GetSlashCommand() (*model.Command, error) {
+func (p *Plugin) GetSlashCommand() (*model.Command, error) {
 	iconData, err := apicommand.GetIconData(p.API, "assets/command.svg")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get icon data")
@@ -89,7 +89,7 @@ func (p *SplunkPlugin) GetSlashCommand() (*model.Command, error) {
 	}, nil
 }
 
-func (p *SplunkPlugin) newCommand(args *model.CommandArgs) *CommandHandler {
+func (p *Plugin) newCommand(args *model.CommandArgs) *CommandHandler {
 	c := &CommandHandler{
 		args:   args,
 		config: p.GetConfiguration(),
@@ -310,7 +310,7 @@ func createMDForLogsList(results []string, fallback string) string {
 func addSubCommands(splunk *model.AutocompleteData) {
 	splunk.AddCommand(createAlertCommand())
 	splunk.AddCommand(createAuthCommand())
-	splunk.AddCommand(createlogCommand())
+	splunk.AddCommand(createLogCommand())
 	splunk.AddCommand(createHelpCommand())
 }
 
@@ -349,7 +349,7 @@ func createAuthCommand() *model.AutocompleteData {
 	return auth
 }
 
-func createlogCommand() *model.AutocompleteData {
+func createLogCommand() *model.AutocompleteData {
 	log := model.NewAutocompleteData(
 		"log", "[list / logname]", "")
 

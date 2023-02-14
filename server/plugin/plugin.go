@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type SplunkPlugin struct {
+type Plugin struct {
 	mattermostPlugin.MattermostPlugin
 
 	httpHandler http.Handler
@@ -37,8 +37,8 @@ type SplunkPlugin struct {
 }
 
 // NewWithConfig creates new plugin object from configuration
-func NewWithConfig(conf *config.Config) *SplunkPlugin {
-	p := &SplunkPlugin{
+func NewWithConfig(conf *config.Config) *Plugin {
+	p := &Plugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
 	}
@@ -46,8 +46,8 @@ func NewWithConfig(conf *config.Config) *SplunkPlugin {
 }
 
 // NewWithStore creates new plugin object from configuration and store object
-func NewWithStore(store store.Store, conf *config.Config) *SplunkPlugin {
-	p := &SplunkPlugin{
+func NewWithStore(store store.Store, conf *config.Config) *Plugin {
+	p := &Plugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
 	}
@@ -58,8 +58,8 @@ func NewWithStore(store store.Store, conf *config.Config) *SplunkPlugin {
 }
 
 // NewWithSplunk creates new plugin object from splunk
-func NewWithSplunk(sp splunk.Splunk, conf *config.Config) *SplunkPlugin {
-	p := &SplunkPlugin{
+func NewWithSplunk(sp splunk.Splunk, conf *config.Config) *Plugin {
+	p := &Plugin{
 		configurationLock: &sync.RWMutex{},
 		config:            conf,
 		sp:                sp,
@@ -70,7 +70,7 @@ func NewWithSplunk(sp splunk.Splunk, conf *config.Config) *SplunkPlugin {
 }
 
 // OnActivate called when plugin is activated
-func (p *SplunkPlugin) OnActivate() error {
+func (p *Plugin) OnActivate() error {
 	rand.Seed(time.Now().UnixNano())
 
 	if p.sp == nil {
@@ -104,7 +104,7 @@ func (p *SplunkPlugin) OnActivate() error {
 }
 
 // ExecuteCommand hook is called when slash command is submitted
-func (p *SplunkPlugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
+func (p *Plugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	mattermostUserID := commandArgs.UserId
 	if len(mattermostUserID) == 0 {
 		errorMsg := "Not authorized"
@@ -128,7 +128,7 @@ func (p *SplunkPlugin) ExecuteCommand(_ *mattermostPlugin.Context, commandArgs *
 	}
 }
 
-func (p *SplunkPlugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
+func (p *Plugin) sendEphemeralResponse(args *model.CommandArgs, text string) *model.CommandResponse {
 	p.API.SendEphemeralPost(args.UserId, &model.Post{
 		UserId:    p.sp.BotUser(),
 		ChannelId: args.ChannelId,
@@ -138,7 +138,7 @@ func (p *SplunkPlugin) sendEphemeralResponse(args *model.CommandArgs, text strin
 }
 
 // OnConfigurationChange is invoked when Config changes may have been made.
-func (p *SplunkPlugin) OnConfigurationChange() error {
+func (p *Plugin) OnConfigurationChange() error {
 	var configuration = new(config.Config)
 
 	// Load the public Config fields from the Mattermost server Config.
@@ -151,14 +151,14 @@ func (p *SplunkPlugin) OnConfigurationChange() error {
 	return nil
 }
 
-func (p *SplunkPlugin) ServeHTTP(_ *mattermostPlugin.Context, w http.ResponseWriter, req *http.Request) {
+func (p *Plugin) ServeHTTP(_ *mattermostPlugin.Context, w http.ResponseWriter, req *http.Request) {
 	p.httpHandler.ServeHTTP(w, req)
 }
 
 // GetConfiguration retrieves the active Config under lock, making it safe to use
 // concurrently. The active Config may change underneath the client of this method, but
 // the struct returned by this API call is considered immutable.
-func (p *SplunkPlugin) GetConfiguration() *config.Config {
+func (p *Plugin) GetConfiguration() *config.Config {
 	p.configurationLock.RLock()
 	defer p.configurationLock.RUnlock()
 
@@ -178,7 +178,7 @@ func (p *SplunkPlugin) GetConfiguration() *config.Config {
 // This method panics if setConfiguration is called with the existing Config. This almost
 // certainly means that the Config was modified without being cloned and may result in
 // an unsafe access.
-func (p *SplunkPlugin) setConfiguration(configuration *config.Config) {
+func (p *Plugin) setConfiguration(configuration *config.Config) {
 	p.configurationLock.Lock()
 	defer p.configurationLock.Unlock()
 
