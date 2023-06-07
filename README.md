@@ -6,7 +6,9 @@ A Splunk integration for Mattermost which enables users to get logs and alerts f
 
 ## Admin guide
 
-### Marketplace installation
+### Installation
+
+#### Marketplace installation
 1. In Mattermost, go to **Main Menu > Plugin Marketplace**.
 2. Search for "Splunk" or find the plugin from the list.
 3. Select **Install**.
