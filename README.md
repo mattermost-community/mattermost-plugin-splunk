@@ -79,7 +79,7 @@ export MM_ADMIN_PASSWORD=password
 make deploy
 ```
 
-or configuration of a [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html):
+or configuration of a [personal access token](https://developers.mattermost.com/integrate/reference/personal-access-token/):
 
 ```
 export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
