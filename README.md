@@ -15,7 +15,7 @@ A Splunk integration for Mattermost which enables users to get logs and alerts f
 4. When the plugin has downloaded and been installed, select **Configure**.
 
 #### Manual installation
-If your server doesn't have access to the internet, you can download the [latest plugin binary release](https://github.com/mattermost/mattermost-plugin-splunk/releases) and upload it to your server via **System Console > Plugin Management**. The releases on this page are the same used by the Marketplace. To learn more about how to upload a plugin, see the [Mattermost Developer documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
+If your server doesn't have access to the internet, you can download the [latest plugin binary release](https://github.com/mattermost/mattermost-plugin-splunk/releases) and upload it to your server via **System Console > Plugin Management**. The releases on this page are the same used by the Marketplace. To learn more about how to upload a plugin, see the [Mattermost Developer documentation](https://developers.mattermost.com/integrate/plugins/using-and-managing-plugins/).
 
 ## User guide
 
@@ -99,7 +99,7 @@ This repository is licensed under the [Apache 2.0 License](https://github.com/ma
 
 ## Contributing
 
-Visit our [Development guide](https://mattermost.gitbook.io/splunk-plugin/development/development) for information about how to contribute to this plugin.
+This plugin contains both a server and web app portion. Read our documentation about the [Developer Workflow](https://developers.mattermost.com/extend/plugins/developer-workflow/) and [Developer Setup](https://developers.mattermost.com/extend/plugins/developer-setup/) for more information about developing and extending plugins.
 
 ## Help wanted
 
