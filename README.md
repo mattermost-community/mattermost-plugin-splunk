@@ -22,11 +22,11 @@
 
 A Splunk integration for Mattermost which enables users to get logs and alerts from Splunk server. 
 
-## Admin guide
+## Admin Guide
 
 The Admin Guide docs for the Mattermost Splunk Plugin can be found [here](/docs/admin-guide.md)
 
-## User guide
+## End User Guide
 
 - **Authenticate user**: Use ``/splunk auth login [server base url] [splunk username]/[token]``. 
     - You must be logged into the system before you can use any slash commands regarding logging. To authenticate the user, you can use this slash command with two required parameters: Splunk server base URL, Splunk username, or token. 
