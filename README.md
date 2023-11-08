@@ -10,7 +10,7 @@
 
 ## Contents
 - [Overview](#overview)
-- [Admin Guide](#admin-guide)
+- [Admin Guide](./docs/admin-guide.md)
 - [End User Guide](#end-user-guide)
 - [Contribute](#contribute)
     - [Development](#development)
