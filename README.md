@@ -1,23 +1,32 @@
-# Splunk Plugin 
+# Mattermost Splunk Plugin 
+![CircleCI branch](https://img.shields.io/circleci/project/github/mattermost/mattermost-plugin-splunk/master.svg)
+[![Code Coverage](https://img.shields.io/codecov/c/github/mattermost/mattermost-plugin-splunk/master.svg)](https://codecov.io/gh/mattermost/mattermost-plugin-splunk/branch/master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mattermost/mattermost-plugin-splunk)](https://goreportcard.com/report/github.com/mattermost/mattermost-plugin-splunk)
+[![HW](https://img.shields.io/github/issues/mattermost/mattermost-plugin-splunk/Up%20For%20Grabs?color=dark%20green&label=Help%20Wanted)](https://github.com/mattermost/mattermost-plugin-splunk/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Up+For+Grabs%22+label%3A%22Help+Wanted%22)
+
 **Maintainer:** [@dbejanishvili](https://github.com/dbejanishvili)
 **Co-Maintainers:** [@bakurits](https://github.com/bakurits) [@Gvantsats](https://github.com/Gvantsats)
 
+
+## Contents
+- [Overview](#overview)
+- [Installation](#installation)
+- [End User Guide](#end-user-guide)
+- [Contribute](#contribute)
+    - [Development](#development)
+- [License](#license)
+- [Get Help](#get-help)
+- [Help Wanted](#help-wanted)
+
+## Overview
+
 A Splunk integration for Mattermost which enables users to get logs and alerts from Splunk server. 
 
-## Admin guide
+## Installation
 
-### Installation
+You can download the [latest plugin binary release](https://github.com/mattermost/mattermost-plugin-splunk/releases) and upload it to your server via **System Console > Plugin Management**.
 
-#### Marketplace installation
-1. In Mattermost, go to **Main Menu > Plugin Marketplace**.
-2. Search for "Splunk" or find the plugin from the list.
-3. Select **Install**.
-4. When the plugin has downloaded and been installed, select **Configure**.
-
-#### Manual installation
-If your server doesn't have access to the internet, you can download the [latest plugin binary release](https://github.com/mattermost/mattermost-plugin-splunk/releases) and upload it to your server via **System Console > Plugin Management**. The releases on this page are the same used by the Marketplace. To learn more about how to upload a plugin, see the [Mattermost Developer documentation](https://developers.mattermost.com/integrate/plugins/using-and-managing-plugins/).
-
-## User guide
+## End User Guide
 
 - **Authenticate user**: Use ``/splunk auth login [server base url] [splunk username]/[token]``. 
     - You must be logged into the system before you can use any slash commands regarding logging. To authenticate the user, you can use this slash command with two required parameters: Splunk server base URL, Splunk username, or token. 
@@ -39,6 +48,10 @@ If your server doesn't have access to the internet, you can download the [latest
     ![image](https://github.com/mattermost/mattermost-plugin-splunk/assets/74422101/0d4ec851-0420-4c23-8c3c-539142f1db63)
 
     ![image](https://github.com/mattermost/mattermost-plugin-splunk/assets/74422101/f689b63e-9090-4ab5-8dc2-af1152440c02)
+
+## Contribute
+
+This plugin contains both a server and web app portion. Read our documentation about the [Developer Workflow](https://developers.mattermost.com/extend/plugins/developer-workflow/) and [Developer Setup](https://developers.mattermost.com/extend/plugins/developer-setup/) for more information about developing and extending plugins.
 
 ## Development
 
@@ -89,18 +102,15 @@ make deploy
 
 In production, deploy and upload your plugin via the Mattermost System Console. See the [Mattermost Developer documentation](https://developers.mattermost.com/integrate/plugins/using-and-managing-plugins/) for details.
 
-## Help and support
-
-For questions, suggestions, and help, visit the [Splunk Plugin channel](https://community.mattermost.com/core/channels/plugin-splunk) on our Community server. To report a bug, please open a GitHub issue.
-
 ## License
 
 This repository is licensed under the [Apache 2.0 License](https://github.com/mattermost/mattermost-plugin-splunk/blob/master/LICENSE).
 
-## Contributing
+## Get Help
 
-This plugin contains both a server and web app portion. Read our documentation about the [Developer Workflow](https://developers.mattermost.com/extend/plugins/developer-workflow/) and [Developer Setup](https://developers.mattermost.com/extend/plugins/developer-setup/) for more information about developing and extending plugins.
+For questions, suggestions, and help, visit the [Splunk Plugin channel](https://community.mattermost.com/core/channels/plugin-splunk) on our Community server. To report a bug, please open a GitHub issue.
 
-## Help wanted
+
+## Help Wanted
 
 If you're interested in joining our community of developers who contribute to Mattermost, check out the current set of issues that are being requested. You can also find issues labeled "Help Wanted" in the Jira repository that we have laid out the primary requirements for and could use some coding help from the community.
