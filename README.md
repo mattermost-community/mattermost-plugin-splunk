@@ -10,7 +10,7 @@
 
 ## Contents
 - [Overview](#overview)
-- [Admin Guide](./docs/admin-guide.md)
+- [Installation](#installation)
 - [End User Guide](#end-user-guide)
 - [Contribute](#contribute)
     - [Development](#development)
@@ -22,9 +22,9 @@
 
 A Splunk integration for Mattermost which enables users to get logs and alerts from Splunk server. 
 
-## Admin Guide
+## Installation
 
-The Admin Guide docs for the Mattermost Splunk Plugin can be found [here](/docs/admin-guide.md)
+You can download the [latest plugin binary release](https://github.com/mattermost/mattermost-plugin-splunk/releases) and upload it to your server via **System Console > Plugin Management**.
 
 ## End User Guide
 
